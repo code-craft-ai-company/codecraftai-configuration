@@ -17,8 +17,17 @@ packages = [{include="automojo", from="source/packages"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
+pyyaml = "^6.0.2"
+cryptography = "^45.0.5"
+requests = "^2.32.4"
 automojo-errors = { git = "https://github.com/automationmojo/automojo-errors.git", branch = "main" }
 automojo-presence = { git = "https://github.com/automationmojo/automojo-presence.git", branch = "main" }
+couchdb = { version="^1.2", optional = true}
+pymongo = { version="^4.13.2", optional = true }
+
+[tool.poetry.extras]
+couchdb = ["couchdb"]
+pymongo = ["pymongo"]
 
 [tool.poetry.group.dev.dependencies]
 
