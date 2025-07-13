@@ -13,15 +13,12 @@ __credits__ = []
 
 from typing import List
 
-from automojo.ci.runtime.contextpaths import ContextPaths
-from automojo.ci.runtime.wellknown import ContextSingleton
+from automojo.presence.contextpaths import ContextPaths
+from automojo.presence.wellknown import ContextSingleton
 
 from automojo.configuration.normalize import normalize_file_path_list, normalize_source_path_list
 from automojo.configuration.configurationsettings import AM_CONFIG_DEFAULTS
 from automojo.configuration.configurationvariables import AM_CONFIG_VARIABLES
-
-
-ctx = ContextSingleton()
 
 class AM_CONFIG_OPTION_OVERRIDES:
 
@@ -33,7 +30,9 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param landscape_names: The names of the credential configs to use when creating the credential config.
         """
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_CREDENTIAL_NAMES, credential_names)
+
         AM_CONFIG_VARIABLES.AM_CONFIG_CREDENTIAL_NAMES = credential_names
         AM_CONFIG_VARIABLES.AM_CONFIG_USE_CREDENTIALS = True
         return
@@ -47,7 +46,10 @@ class AM_CONFIG_OPTION_OVERRIDES:
             :param sources: The uri(s) of to use as the credential config search uri(s).
         """
         sources = normalize_source_path_list(sources)
+        
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_CREDENTIAL_SOURCES, sources)
+        
         AM_CONFIG_VARIABLES.AM_CONFIG_CREDENTIAL_SOURCES = sources
         return
 
@@ -60,7 +62,10 @@ class AM_CONFIG_OPTION_OVERRIDES:
             :param filepaths: A list of file paths for configuration files.
         """
         filepaths = normalize_file_path_list(filepaths)
+
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_CREDENTIAL_FILES, filepaths)
+
         AM_CONFIG_VARIABLES.AM_CONFIG_CREDENTIAL_FILES = filepaths
         return
 
@@ -72,7 +77,9 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param landscape_names: The names of the landscape configs to use when creating the landscape config.
         """
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_LANDSCAPE_NAMES, landscape_names)
+
         AM_CONFIG_VARIABLES.AM_CONFIG_LANDSCAPE_NAMES = landscape_names
         AM_CONFIG_VARIABLES.AM_CONFIG_USE_LANDSCAPE = True
         return
@@ -86,7 +93,10 @@ class AM_CONFIG_OPTION_OVERRIDES:
             :param sources: The uri(s) of to use as the landscape config search uri(s).
         """
         sources = normalize_source_path_list(sources)
+
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_LANDSCAPE_SOURCES, sources)
+
         AM_CONFIG_VARIABLES.AM_CONFIG_LANDSCAPE_SOURCES = sources
         return
 
@@ -99,7 +109,10 @@ class AM_CONFIG_OPTION_OVERRIDES:
             :param filepaths: A list of file paths for configuration files.
         """
         filepaths = normalize_file_path_list(filepaths)
+
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_LANDSCAPE_FILES, filepaths)
+
         AM_CONFIG_VARIABLES.AM_CONFIG_LANDSCAPE_FILES = filepaths
         return
 
@@ -111,7 +124,9 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param runtime_names: The names of the runtime files to use when selecting runtime files.
         """
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_RUNTIME_NAMES, runtime_names)
+
         AM_CONFIG_VARIABLES.AM_CONFIG_RUNTIME_NAMES = runtime_names
         AM_CONFIG_VARIABLES.AM_CONFIG_USE_RUNTIME = True
         return
@@ -126,7 +141,10 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
         """
         sources = normalize_source_path_list(sources)
+
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_RUNTIME_SOURCES, sources)
+        
         AM_CONFIG_VARIABLES.AM_CONFIG_RUNTIME_SOURCES = sources
         return
 
@@ -139,7 +157,10 @@ class AM_CONFIG_OPTION_OVERRIDES:
             :param filepaths: A list of file paths for configuration files.
         """
         filepaths = normalize_file_path_list(filepaths)
+
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_RUNTIME_FILES, filepaths)
+        
         AM_CONFIG_VARIABLES.AM_CONFIG_RUNTIME_FILES = filepaths
         return
 
@@ -152,7 +173,9 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param topology_names: The names of the topology files to use when selecting topology files.
         """
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_TOPOLOGY_NAMES, topology_names)
+
         AM_CONFIG_VARIABLES.AM_CONFIG_TOPOLOGY_NAMES = topology_names
         AM_CONFIG_VARIABLES.AM_CONFIG_USE_TOPOLOGY = True
         return
@@ -166,7 +189,10 @@ class AM_CONFIG_OPTION_OVERRIDES:
             :param sources: The uri(s) of to use as the topology config search uri(s).
         """
         sources = normalize_source_path_list(sources)
+
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_TOPOLOGY_SOURCES, sources)
+        
         AM_CONFIG_VARIABLES.AM_CONFIG_TOPOLOGY_SOURCES = sources
         return
 
@@ -179,7 +205,10 @@ class AM_CONFIG_OPTION_OVERRIDES:
             :param filepaths: A list of file paths for configuration files.
         """
         filepaths = normalize_file_path_list(filepaths)
+
+        ctx = ContextSingleton()
         ctx.insert(ContextPaths.CONFIG_TOPOLOGY_FILES, filepaths)
+        
         AM_CONFIG_VARIABLES.AM_CONFIG_TOPOLOGY_FILES = filepaths
         return
 

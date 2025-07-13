@@ -22,7 +22,8 @@ from automojo.errors.exceptions import SemanticError
 from automojo.xmodules.xcollections.context import Context
 from automojo.xmodules.xcollections.wellknown import ContextSingleton
 
-from automojo.ci.runtime.contextpaths import ContextPaths
+from automojo.presence.contextpaths import ContextPaths
+
 from automojo.configuration.configurationvariables import (
     AM_CONFIG_VARNAMES,
     AM_CONFIG_VARIABLES,

@@ -15,7 +15,8 @@ __credits__ = []
 from typing import Optional
 
 from automojo.presence.wellknown import ConfigParserSingleton
-from automojo.ci.runtime.runtimesettings import establish_runtime_settings
+from automojo.presence.presencesettings import establish_presence_settings
+
 
 default_config = {}
 
@@ -69,7 +70,7 @@ def establish_configuration_settings(*, name: Optional[str]=None, home_dir: Opti
     if not CONFIG_SETTINGS_ESTABLISHED:
         CONFIG_SETTINGS_ESTABLISHED = True
 
-        establish_runtime_settings(name=name, home_dir=home_dir, settings_file=settings_file, extension_modules=extension_modules, **other)
+        establish_presence_settings(name=name, home_dir=home_dir, settings_file=settings_file, extension_modules=extension_modules, **other)
 
         if default_configuration is not None:
             AM_CONFIG_DEFAULTS.DEFAULT_CONFIGURATION = default_configuration

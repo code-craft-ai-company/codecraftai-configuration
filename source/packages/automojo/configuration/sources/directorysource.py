@@ -15,7 +15,6 @@ from automojo.configuration.sources.configurationsourcebase import (
     ConfigurationSourceBase
 )
 
-
 EXTENSION_TO_CONFIG_FORMAT = {
     "yml": ConfigurationFormat.YAML,
     "yaml": ConfigurationFormat.YAML,
