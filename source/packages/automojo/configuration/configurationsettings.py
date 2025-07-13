@@ -15,8 +15,7 @@ __credits__ = []
 from typing import Optional
 
 from automojo.presence.wellknown import ConfigParserSingleton
-from automojo.presence.presencesettings import establish_presence_settings
-
+from automojo.presence.presencesettings import establish_presence_settings, AM_PRESENCE_DEFAULTS
 
 default_config = {}
 
@@ -24,7 +23,7 @@ config = ConfigParserSingleton()
 if "AUTOMOJO-CONFIG" in config:
     default_config = config["AUTOMOJO-CONFIG"]
 
-class AM_CONFIG_DEFAULTS:
+class AM_CONFIG_DEFAULTS(AM_PRESENCE_DEFAULTS):
 
     AM_CONFIG_REQUIRE_CREDENTIALS = False
     if "AM_CONFIG_REQUIRE_CREDENTIALS" in default_config:
