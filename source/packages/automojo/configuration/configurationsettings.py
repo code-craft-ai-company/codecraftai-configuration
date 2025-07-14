@@ -75,3 +75,4 @@ def establish_configuration_settings(*, name: Optional[str]=None, home_dir: Opti
             AM_CONFIG_DEFAULTS.DEFAULT_CONFIGURATION = default_configuration
 
     return
+

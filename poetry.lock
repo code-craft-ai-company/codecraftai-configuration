@@ -82,7 +82,7 @@ automojo-waiting = {git = "https://github.com/automationmojo/automojo-waiting.gi
 type = "git"
 url = "https://github.com/automationmojo/automojo-xmodules.git"
 reference = "main"
-resolved_reference = "95049d2968a4fba0a76bbda103112439ea728b9c"
+resolved_reference = "af94ca5c0f1064aa533e7b09364e0b06508cb05e"
 
 [[package]]
 name = "certifi"
@@ -349,7 +349,7 @@ test-randomorder = ["pytest-randomly"]
 name = "dnspython"
 version = "2.7.0"
 description = "DNS toolkit"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "dnspython-2.7.0-py3-none-any.whl", hash = "sha256:b4c34b7d10b51bcc3a5071e7b8dee77939f1e878477eeecc965e9835f63c6c86"},
@@ -394,7 +394,7 @@ files = [
 name = "pymongo"
 version = "4.13.2"
 description = "PyMongo - the Official MongoDB Python driver"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "pymongo-4.13.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:01065eb1838e3621a30045ab14d1a60ee62e01f65b7cf154e69c5c722ef14d2f"},
@@ -571,9 +571,9 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [extras]
 couchdb = ["couchdb"]
-pymongo = []
+pymongo = ["pymongo"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "338f9839889f5dd5c809cf8bf1e39499b6b89e2824769611903453b0e3f5c1c0"
+content-hash = "c2c20e8ab97bb5810cf2e2ef12f167244a24a8df1cc0858cef9a25b85550c42f"
