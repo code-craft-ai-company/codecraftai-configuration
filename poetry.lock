@@ -48,7 +48,7 @@ automojo-xmodules = {git = "https://github.com/automationmojo/automojo-xmodules.
 type = "git"
 url = "https://github.com/automationmojo/automojo-presence.git"
 reference = "main"
-resolved_reference = "da3b88d6a90b6f5d8f2e2ff3cec0a8289eb093c9"
+resolved_reference = "92fc51420c7bebe50b09b0083bdcabb8b6db97e1"
 
 [[package]]
 name = "automojo-waiting"
@@ -82,7 +82,7 @@ automojo-waiting = {git = "https://github.com/automationmojo/automojo-waiting.gi
 type = "git"
 url = "https://github.com/automationmojo/automojo-xmodules.git"
 reference = "main"
-resolved_reference = "af94ca5c0f1064aa533e7b09364e0b06508cb05e"
+resolved_reference = "32190e288c782f1cad9c3901d6c57b5d3f831b09"
 
 [[package]]
 name = "certifi"
