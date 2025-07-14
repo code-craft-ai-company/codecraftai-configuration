@@ -24,8 +24,9 @@ from automojo.xmodules.xcollections.wellknown import ContextSingleton
 
 from automojo.presence.contextpaths import ContextPaths
 
+from automojo.configuration.constants import AM_CONFIG_VARIABLE_NAMES
+
 from automojo.configuration.configurationvariables import (
-    AM_CONFIG_VARNAMES,
     AM_CONFIG_VARIABLES,
     CONFIGURATION_MAPS
 )
