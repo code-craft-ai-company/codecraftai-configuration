@@ -15,11 +15,11 @@ Avoid composite tests that validate multiple components or functions in a series
 Use Python's `unittest` framework with `setUp` and `tearDown` methods to establish shared conditions across tests while maintaining separation of concerns.
 
 # Code Naming Conventions
-The code naming conventions of this repository follows the [Automation Mojo Python Naming Conventions](https://github.com/automationmojo/automojo-docs/blob/main/userguide/10-01-naming-conventions.rst)
+The code naming conventions of this repository follows the [Automation Mojo Python Naming Conventions](userguide/10-02-naming-conventions.rst)
 
 
 # Code Structure
-The code structure of this repository follows the [Automation Mojo Python Code Structure Standards](https://github.com/automationmojo/automojo-docs/blob/main/userguide/10-01-code-organization.rst)
+The code structure of this repository follows the [Automation Mojo Python Code Structure Standards](userguide/10-01-code-organization.rst)
 
 
 # Coding Standards
@@ -28,7 +28,7 @@ The code in this repository is meant to be utilized by testing tools and test fr
 *  debuggability over performance
 *  readability over conciseness
 
-For all the code in this repository, follow the coding standards specified at [Coding Standards](https://github.com/automationmojo/automojo-docs/blob/main/userguide/10-00-coding-standards.rst)
+For all the code in this repository, follow the coding standards specified at [Coding Standards](userguide/10-00-coding-standards.rst)
 
 
 # Environment Setup
