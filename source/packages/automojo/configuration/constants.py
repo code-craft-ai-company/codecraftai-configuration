@@ -10,49 +10,78 @@ __author__ = "Myron Walker"
 __copyright__ = "Copyright 2025, Automation Mojo LLC"
 __credits__ = []
 
+import os
 
-from automojo.presence.constants import AM_PRESENCE_VARIABLE_NAMES
+from automojo.xmodules.xconvert import parse_bool
+from automojo.xmodules.xvariables import VariableDesc, VariableSource
 
-class AM_CONFIG_VARIABLE_NAMES(AM_PRESENCE_VARIABLE_NAMES):
+from automojo.presence.constants import PresenceVariableDesc
+from automojo.presence.contextpaths import ContextPaths
+from automojo.presence.presencevariables import PresenceVariables
 
-    AM_NAME = "AM_NAME"
 
-    AM_HOME_DIRECTORY = "AM_HOME_DIRECTORY"
+from automojo.configuration.normalize import (
+    split_and_normalize_name_list,
+    split_and_normalize_path_list,
+    split_and_normalize_source_list
+)
 
-    AM_CONFIG_DIRECTORY = "AM_CONFIG_DIRECTORY"
 
-    AM_CONFIG_PASS_PHRASE = "AM_CONFIG_PASS_PHRASE"
+class ConfigVariableDesc(PresenceVariableDesc):
 
-    AM_CONFIG_STORAGE_URI = "AM_CONFIG_STORAGE_URI"
+    AM_CONFIG_DIRECTORY = VariableDesc(default=os.path.join(PresenceVariableDesc.AM_PRESENCE_DIRECTORY.default, "config"))
+    AM_CONFIG_PASS_PHRASE = VariableDesc()
+    AM_CONFIG_STORAGE_URI = VariableDesc(context_path=ContextPaths.CONFIG_STORAGE_URI)
 
-    AM_CONFIG_CREDENTIAL_NAMES = "AM_CONFIG_CREDENTIAL_NAMES"
-    AM_CONFIG_CREDENTIAL_URIS = "AM_CONFIG_CREDENTIAL_URIS"
-    AM_CONFIG_CREDENTIAL_SOURCES = "AM_CONFIG_CREDENTIAL_SOURCES"
-    AM_CONFIG_CREDENTIAL_FILES = "AM_CONFIG_CREDENTIAL_FILES"
 
-    AM_CONFIG_DATAPROFILE_NAMES = "AM_CONFIG_DATAPROFILE_NAMES"
-    AM_CONFIG_DATAPROFILE_URIS = "AM_CONFIG_DATAPROFILE_URIS"
-    AM_CONFIG_DATAPROFILE_SOURCES = "AM_CONFIG_DATAPROFILE_SOURCES"
-    AM_CONFIG_DATAPROFILE_FILES = "AM_CONFIG_DATAPROFILE_FILES"
 
-    AM_CONFIG_LANDSCAPE_NAMES = "AM_CONFIG_LANDSCAPE_NAMES"
-    AM_CONFIG_LANDSCAPE_URIS = "AM_CONFIG_LANDSCAPE_URIS"
-    AM_CONFIG_LANDSCAPE_SOURCES = "AM_CONFIG_LANDSCAPE_SOURCES"
-    AM_CONFIG_LANDSCAPE_FILES = "AM_CONFIG_LANDSCAPE_FILES"
+    AM_CONFIG_CREDENTIAL_NAMES = VariableDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_CREDENTIAL_FILES = VariableDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_CREDENTIAL_SOURCES = VariableDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_SOURCES, default="",
+                                                converter=split_and_normalize_source_list)
+    
 
-    AM_CONFIG_TOPOLOGY_NAMES = "AM_CONFIG_TOPOLOGY_NAMES"
-    AM_CONFIG_TOPOLOGY_URIS = "AM_CONFIG_TOPOLOGY_URIS"
-    AM_CONFIG_TOPOLOGY_SOURCES = "AM_CONFIG_TOPOLOGY_SOURCES"
-    AM_CONFIG_TOPOLOGY_FILES = "AM_CONFIG_TOPOLOGY_FILES"
 
-    AM_CONFIG_RUNTIME_NAMES = "AM_CONFIG_RUNTIME_NAMES"
-    AM_CONFIG_RUNTIME_URIS = "AM_CONFIG_RUNTIME_URIS"
-    AM_CONFIG_RUNTIME_SOURCES = "AM_CONFIG_RUNTIME_SOURCES"
-    AM_CONFIG_RUNTIME_FILES = "AM_CONFIG_RUNTIME_FILES"
+    AM_CONFIG_DATAPROFILE_NAMES = VariableDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_DATAPROFILE_FILES = VariableDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_DATAPROFILE_SOURCES = VariableDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_SOURCES, default="")
+    
 
-    AM_CONFIG_REQUIRE_CREDENTIALS = "AM_CONFIG_REQUIRE_CREDENTIALS"
-    AM_CONFIG_REQUIRE_DATAPROFILES = "AM_CONFIG_REQUIRE_DATAPROFILES"
-    AM_CONFIG_REQUIRE_LANDSCAPE = "AM_CONFIG_REQUIRE_LANDSCAPE"
-    AM_CONFIG_REQUIRE_RUNTIME = "AM_CONFIG_REQUIRE_RUNTIME"
-    AM_CONFIG_REQUIRE_TOPOLOGY = "AM_CONFIG_REQUIRE_TOPOLOGY"
+    AM_CONFIG_LANDSCAPE_NAMES = VariableDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_LANDSCAPE_FILES = VariableDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_LANDSCAPE_SOURCES = VariableDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_SOURCES, default="")
+    
+
+
+    AM_CONFIG_TOPOLOGY_NAMES = VariableDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_TOPOLOGY_FILES = VariableDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_TOPOLOGY_SOURCES = VariableDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_SOURCES, default="")
+    
+
+
+    AM_CONFIG_RUNTIME_NAMES = VariableDesc(context_path=ContextPaths.CONFIG_RUNTIME_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_RUNTIME_FILES = VariableDesc(context_path=ContextPaths.CONFIG_RUNTIME_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_RUNTIME_SOURCES = VariableDesc(context_path=ContextPaths.CONFIG_RUNTIME_SOURCES, default="")
+    
+
+
+    AM_CONFIG_REQUIRE_CREDENTIALS = VariableDesc(converter=parse_bool)
+    AM_CONFIG_REQUIRE_DATAPROFILES = VariableDesc(converter=parse_bool)
+    AM_CONFIG_REQUIRE_LANDSCAPE = VariableDesc(converter=parse_bool)
+    AM_CONFIG_REQUIRE_RUNTIME = VariableDesc(converter=parse_bool)
+    AM_CONFIG_REQUIRE_TOPOLOGY = VariableDesc(converter=parse_bool)
+
+
+    AM_CONFIG_USE_CREDENTIALS = VariableDesc(source=VariableSource.NONE)
+    AM_CONFIG_USE_DATAPROFILES = VariableDesc(source=VariableSource.NONE)
+    AM_CONFIG_USE_LANDSCAPE = VariableDesc(source=VariableSource.NONE)
+    AM_CONFIG_USE_RUNTIME = VariableDesc(source=VariableSource.NONE)
+    AM_CONFIG_USE_TOPOLOGY = VariableDesc(source=VariableSource.NONE)
+
+
+    AM_CONFIG_CREDENTIAL_URIS = VariableDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_URIS, source=VariableSource.NONE)
+    AM_CONFIG_DATAPROFILE_URIS = VariableDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_URIS, source=VariableSource.NONE)
+    AM_CONFIG_LANDSCAPE_URIS = VariableDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_URIS, source=VariableSource.NONE)
+    AM_CONFIG_TOPOLOGY_URIS = VariableDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_URIS, source=VariableSource.NONE)
+    AM_CONFIG_RUNTIME_URIS = VariableDesc(context_path=ContextPaths.CONFIG_RUNTIME_URIS, source=VariableSource.NONE)
 

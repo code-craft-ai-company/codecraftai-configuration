@@ -14,13 +14,17 @@ __credits__ = []
 from typing import List
 
 from automojo.presence.contextpaths import ContextPaths
-from automojo.presence.wellknown import ContextSingleton
+from automojo.presence.wellknown import ThisApplicationSingleton
 
-from automojo.configuration.normalize import normalize_file_path_list, normalize_source_path_list
+from automojo.configuration.normalize import SEPARATOR, normalize_file_path_list, normalize_source_path_list
+
+from automojo.configuration.constants import ConfigVariableDesc
+
 from automojo.configuration.configurationsettings import AM_CONFIG_DEFAULTS
 from automojo.configuration.configurationvariables import AM_CONFIG_VARIABLES
 
-class AM_CONFIG_OPTION_OVERRIDES:
+
+class ConfigOptionOverrides:
 
     @staticmethod
     def override_config_credentials_names(credential_names: List[str]):
@@ -30,11 +34,13 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param landscape_names: The names of the credential configs to use when creating the credential config.
         """
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_CREDENTIAL_NAMES, credential_names)
+        this_app = ThisApplicationSingleton()
+        
+        strval = SEPARATOR.join(credential_names)
 
-        AM_CONFIG_VARIABLES.AM_CONFIG_CREDENTIAL_NAMES = credential_names
-        AM_CONFIG_VARIABLES.AM_CONFIG_USE_CREDENTIALS = True
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_NAMES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS, "True")
+        
         return
 
     @staticmethod
@@ -45,12 +51,11 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param sources: The uri(s) of to use as the credential config search uri(s).
         """
-        sources = normalize_source_path_list(sources)
-        
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_CREDENTIAL_SOURCES, sources)
-        
-        AM_CONFIG_VARIABLES.AM_CONFIG_CREDENTIAL_SOURCES = sources
+        this_app = ThisApplicationSingleton()
+
+        strval = SEPARATOR.join(normalize_source_path_list(sources))
+
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES, strval)
         return
 
     @staticmethod
@@ -61,12 +66,60 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param filepaths: A list of file paths for configuration files.
         """
-        filepaths = normalize_file_path_list(filepaths)
+        this_app = ThisApplicationSingleton()
 
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_CREDENTIAL_FILES, filepaths)
+        strval = SEPARATOR.join(normalize_source_path_list(filepaths))
 
-        AM_CONFIG_VARIABLES.AM_CONFIG_CREDENTIAL_FILES = filepaths
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS, "True")
+        return
+    
+    @staticmethod
+    def override_config_dataprofile_names(dataprofile_names: List[str]):
+        """
+            This override function provides a mechanism overriding the AM_CONFIG_DATAPROFILE_NAMES
+            variable and context configuration setting.
+
+            :param landscape_names: The names of the credential configs to use when creating the credential config.
+        """
+        this_app = ThisApplicationSingleton()
+        
+        strval = SEPARATOR.join(dataprofile_names)
+
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_NAMES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES, "True")
+        
+        return
+
+    @staticmethod
+    def override_config_dataprofile_sources(sources: List[str]):
+        """
+            This override function provides a mechanism overriding the AM_CONFIG_DATAPROFILE_SOURCES
+            variable and context configuration setting.
+
+            :param sources: The uri(s) of to use as the credential config search uri(s).
+        """
+        this_app = ThisApplicationSingleton()
+
+        strval = SEPARATOR.join(normalize_source_path_list(sources))
+
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES, strval)
+        return
+
+    @staticmethod
+    def override_config_dataprofile_files(filepaths: List[str]):
+        """
+            The override function used to override the AM_CONFIG_DATAPROFILE_FILES variable and update
+            the context configuration setting.
+
+            :param filepaths: A list of file paths for configuration files.
+        """
+        this_app = ThisApplicationSingleton()
+
+        strval = SEPARATOR.join(normalize_source_path_list(filepaths))
+
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES, "True")
         return
 
     @staticmethod
@@ -77,11 +130,12 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param landscape_names: The names of the landscape configs to use when creating the landscape config.
         """
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_LANDSCAPE_NAMES, landscape_names)
+        this_app = ThisApplicationSingleton()
+        
+        strval = SEPARATOR.join(landscape_names)
 
-        AM_CONFIG_VARIABLES.AM_CONFIG_LANDSCAPE_NAMES = landscape_names
-        AM_CONFIG_VARIABLES.AM_CONFIG_USE_LANDSCAPE = True
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_NAMES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE, "True")
         return
 
     @staticmethod
@@ -92,12 +146,11 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param sources: The uri(s) of to use as the landscape config search uri(s).
         """
-        sources = normalize_source_path_list(sources)
+        this_app = ThisApplicationSingleton()
 
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_LANDSCAPE_SOURCES, sources)
+        strval = SEPARATOR.join(normalize_source_path_list(sources))
 
-        AM_CONFIG_VARIABLES.AM_CONFIG_LANDSCAPE_SOURCES = sources
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES, strval)
         return
 
     @staticmethod
@@ -108,12 +161,12 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param filepaths: A list of file paths for configuration files.
         """
-        filepaths = normalize_file_path_list(filepaths)
+        this_app = ThisApplicationSingleton()
 
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_LANDSCAPE_FILES, filepaths)
+        strval = SEPARATOR.join(normalize_source_path_list(filepaths))
 
-        AM_CONFIG_VARIABLES.AM_CONFIG_LANDSCAPE_FILES = filepaths
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE, "True")
         return
 
     @staticmethod
@@ -124,11 +177,12 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param runtime_names: The names of the runtime files to use when selecting runtime files.
         """
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_RUNTIME_NAMES, runtime_names)
+        this_app = ThisApplicationSingleton()
+        
+        strval = SEPARATOR.join(runtime_names)
 
-        AM_CONFIG_VARIABLES.AM_CONFIG_RUNTIME_NAMES = runtime_names
-        AM_CONFIG_VARIABLES.AM_CONFIG_USE_RUNTIME = True
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_NAMES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME, "True")
         return
 
     @staticmethod
@@ -140,12 +194,11 @@ class AM_CONFIG_OPTION_OVERRIDES:
             :param sources: The uri(s) of to use as the runtime config search uri(s).
 
         """
-        sources = normalize_source_path_list(sources)
+        this_app = ThisApplicationSingleton()
 
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_RUNTIME_SOURCES, sources)
-        
-        AM_CONFIG_VARIABLES.AM_CONFIG_RUNTIME_SOURCES = sources
+        strval = SEPARATOR.join(normalize_source_path_list(sources))
+
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES, strval)
         return
 
     @staticmethod
@@ -156,12 +209,12 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param filepaths: A list of file paths for configuration files.
         """
-        filepaths = normalize_file_path_list(filepaths)
+        this_app = ThisApplicationSingleton()
 
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_RUNTIME_FILES, filepaths)
-        
-        AM_CONFIG_VARIABLES.AM_CONFIG_RUNTIME_FILES = filepaths
+        strval = SEPARATOR.join(normalize_source_path_list(filepaths))
+
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME, "True")
         return
 
 
@@ -173,11 +226,12 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param topology_names: The names of the topology files to use when selecting topology files.
         """
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_TOPOLOGY_NAMES, topology_names)
+        this_app = ThisApplicationSingleton()
+        
+        strval = SEPARATOR.join(topology_names)
 
-        AM_CONFIG_VARIABLES.AM_CONFIG_TOPOLOGY_NAMES = topology_names
-        AM_CONFIG_VARIABLES.AM_CONFIG_USE_TOPOLOGY = True
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_NAMES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY, "True")
         return
 
     @staticmethod
@@ -188,12 +242,11 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param sources: The uri(s) of to use as the topology config search uri(s).
         """
-        sources = normalize_source_path_list(sources)
+        this_app = ThisApplicationSingleton()
 
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_TOPOLOGY_SOURCES, sources)
-        
-        AM_CONFIG_VARIABLES.AM_CONFIG_TOPOLOGY_SOURCES = sources
+        strval = SEPARATOR.join(normalize_source_path_list(sources))
+
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES, strval)
         return
 
     @staticmethod
@@ -204,17 +257,18 @@ class AM_CONFIG_OPTION_OVERRIDES:
 
             :param filepaths: A list of file paths for configuration files.
         """
-        filepaths = normalize_file_path_list(filepaths)
+        this_app = ThisApplicationSingleton()
 
-        ctx = ContextSingleton()
-        ctx.insert(ContextPaths.CONFIG_TOPOLOGY_FILES, filepaths)
-        
-        AM_CONFIG_VARIABLES.AM_CONFIG_TOPOLOGY_FILES = filepaths
+        strval = SEPARATOR.join(normalize_source_path_list(filepaths))
+
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY, "True")
         return
 
     @staticmethod
-    def override_configuration_requirements(require_credentials: bool,
-            require_landscape: bool, require_runtime: bool, require_topology: bool):
+    def override_configuration_requirements(require_credentials: bool=False,
+            require_landscape: bool=False, require_runtime: bool=False, require_topology: bool=False,
+            require_dataprofiles: bool=False):
         """
             Called before or after activating the runtime in order to modify the required configuration
             files based on the applicaiton or run requirements.
@@ -223,11 +277,14 @@ class AM_CONFIG_OPTION_OVERRIDES:
             :param require_landscape: Indicates a landscape configuration file is required.
             :param require_runtime: Indicates a runtime configuration file is required.
             :param require_topology: Indicates a topology configuration file is required.
+            :param require_dataprofiles: Indicates a dataprofile configuration file is required.
         """
+        this_app = ThisApplicationSingleton()
 
-        AM_CONFIG_DEFAULTS.AM_CONFIG_REQUIRE_CREDENTIALS = require_credentials
-        AM_CONFIG_DEFAULTS.AM_CONFIG_REQUIRE_LANDSCAPE = require_landscape
-        AM_CONFIG_DEFAULTS.AM_CONFIG_REQUIRE_RUNTIME = require_runtime
-        AM_CONFIG_DEFAULTS.AM_CONFIG_REQUIRE_TOPOLOGY = require_topology
-
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS, repr(require_credentials))
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE, repr(require_landscape))
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME, repr(require_runtime))
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY, repr(require_topology))
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES, repr(require_dataprofiles))
+        
         return
