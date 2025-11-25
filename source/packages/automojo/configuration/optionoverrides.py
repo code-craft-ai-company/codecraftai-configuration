@@ -13,16 +13,9 @@ __credits__ = []
 
 from typing import List
 
-from automojo.presence.contextpaths import ContextPaths
 from automojo.presence.wellknown import ThisApplicationSingleton
 
-from automojo.configuration.normalize import SEPARATOR, normalize_file_path_list, normalize_source_path_list
-
 from automojo.configuration.constants import ConfigVariableDesc
-
-from automojo.configuration.configurationsettings import AM_CONFIG_DEFAULTS
-from automojo.configuration.configurationvariables import AM_CONFIG_VARIABLES
-
 
 class ConfigOptionOverrides:
 
@@ -35,11 +28,9 @@ class ConfigOptionOverrides:
             :param landscape_names: The names of the credential configs to use when creating the credential config.
         """
         this_app = ThisApplicationSingleton()
-        
-        strval = SEPARATOR.join(credential_names)
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_NAMES, strval)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS, "True")
+    
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_NAMES, credential_names)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS, True)
         
         return
 
@@ -53,9 +44,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        strval = SEPARATOR.join(normalize_source_path_list(sources))
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES, sources)
         return
 
     @staticmethod
@@ -68,10 +57,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        strval = SEPARATOR.join(normalize_source_path_list(filepaths))
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES, strval)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS, "True")
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS, True)
         return
     
     @staticmethod
@@ -84,10 +71,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
         
-        strval = SEPARATOR.join(dataprofile_names)
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_NAMES, strval)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES, "True")
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_NAMES, dataprofile_names)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES, True)
         
         return
 
@@ -101,9 +86,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        strval = SEPARATOR.join(normalize_source_path_list(sources))
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES, sources)
         return
 
     @staticmethod
@@ -116,10 +99,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        strval = SEPARATOR.join(normalize_source_path_list(filepaths))
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES, strval)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES, "True")
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES, True)
         return
 
     @staticmethod
@@ -132,10 +113,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
         
-        strval = SEPARATOR.join(landscape_names)
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_NAMES, strval)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE, "True")
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_NAMES, landscape_names)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE, True)
         return
 
     @staticmethod
@@ -148,9 +127,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        strval = SEPARATOR.join(normalize_source_path_list(sources))
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES, sources)
         return
 
     @staticmethod
@@ -163,10 +140,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        strval = SEPARATOR.join(normalize_source_path_list(filepaths))
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES, strval)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE, "True")
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE, True)
         return
 
     @staticmethod
@@ -179,10 +154,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
         
-        strval = SEPARATOR.join(runtime_names)
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_NAMES, strval)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME, "True")
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_NAMES, runtime_names)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME, True)
         return
 
     @staticmethod
@@ -196,9 +169,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        strval = SEPARATOR.join(normalize_source_path_list(sources))
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES, sources)
         return
 
     @staticmethod
@@ -211,10 +182,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        strval = SEPARATOR.join(normalize_source_path_list(filepaths))
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES, strval)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME, "True")
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME, True)
         return
 
 
@@ -228,10 +197,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
         
-        strval = SEPARATOR.join(topology_names)
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_NAMES, strval)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY, "True")
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_NAMES, topology_names)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY, True)
         return
 
     @staticmethod
@@ -244,9 +211,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        strval = SEPARATOR.join(normalize_source_path_list(sources))
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES, strval)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES, sources)
         return
 
     @staticmethod
@@ -259,10 +224,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        strval = SEPARATOR.join(normalize_source_path_list(filepaths))
-
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES, strval)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY, "True")
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY, True)
         return
 
     @staticmethod

@@ -26,12 +26,21 @@ from automojo.configuration.normalize import (
     split_and_normalize_source_list
 )
 
+DEFAULT_CONFIGURATION = {
+    "version": "1.0.0",
+    "logging": {
+        "levels": {
+            "console": "INFO",
+            "logfile": "DEBUG"
+        }
+    }
+}
 
 class ConfigVariableDesc(PresenceVariableDesc):
 
     AM_CONFIG_DIRECTORY = VariableDesc(default=os.path.join(PresenceVariableDesc.AM_PRESENCE_DIRECTORY.default, "config"))
     AM_CONFIG_PASS_PHRASE = VariableDesc()
-    AM_CONFIG_STORAGE_URI = VariableDesc(context_path=ContextPaths.CONFIG_STORAGE_URI)
+    AM_CONFIG_STORAGE_URI = VariableDesc(context_path=ContextPaths.CONFIG_STORAGE_URI, default="")
 
 
 
@@ -65,18 +74,18 @@ class ConfigVariableDesc(PresenceVariableDesc):
     
 
 
-    AM_CONFIG_REQUIRE_CREDENTIALS = VariableDesc(converter=parse_bool)
-    AM_CONFIG_REQUIRE_DATAPROFILES = VariableDesc(converter=parse_bool)
-    AM_CONFIG_REQUIRE_LANDSCAPE = VariableDesc(converter=parse_bool)
-    AM_CONFIG_REQUIRE_RUNTIME = VariableDesc(converter=parse_bool)
-    AM_CONFIG_REQUIRE_TOPOLOGY = VariableDesc(converter=parse_bool)
+    AM_CONFIG_REQUIRE_CREDENTIALS = VariableDesc(default=False, converter=parse_bool)
+    AM_CONFIG_REQUIRE_DATAPROFILES = VariableDesc(default=False, converter=parse_bool)
+    AM_CONFIG_REQUIRE_LANDSCAPE = VariableDesc(default=False, converter=parse_bool)
+    AM_CONFIG_REQUIRE_RUNTIME = VariableDesc(default=False, converter=parse_bool)
+    AM_CONFIG_REQUIRE_TOPOLOGY = VariableDesc(default=False, converter=parse_bool)
 
 
-    AM_CONFIG_USE_CREDENTIALS = VariableDesc(source=VariableSource.NONE)
-    AM_CONFIG_USE_DATAPROFILES = VariableDesc(source=VariableSource.NONE)
-    AM_CONFIG_USE_LANDSCAPE = VariableDesc(source=VariableSource.NONE)
-    AM_CONFIG_USE_RUNTIME = VariableDesc(source=VariableSource.NONE)
-    AM_CONFIG_USE_TOPOLOGY = VariableDesc(source=VariableSource.NONE)
+    AM_CONFIG_USE_CREDENTIALS = VariableDesc(default=False, source=VariableSource.NONE)
+    AM_CONFIG_USE_DATAPROFILES = VariableDesc(default=False, source=VariableSource.NONE)
+    AM_CONFIG_USE_LANDSCAPE = VariableDesc(default=False, source=VariableSource.NONE)
+    AM_CONFIG_USE_RUNTIME = VariableDesc(default=False, source=VariableSource.NONE)
+    AM_CONFIG_USE_TOPOLOGY = VariableDesc(default=False, source=VariableSource.NONE)
 
 
     AM_CONFIG_CREDENTIAL_URIS = VariableDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_URIS, source=VariableSource.NONE)
