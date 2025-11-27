@@ -51,7 +51,7 @@ automojo-xmodules = {git = "https://github.com/automationmojo/automojo-xmodules.
 type = "git"
 url = "https://github.com/automationmojo/automojo-presence.git"
 reference = "main"
-resolved_reference = "49c4ff436bd4c83681833b47fb1ed691c861f7ff"
+resolved_reference = "7f9634333e4b8452260cf70d78d4fdfc84b24e8a"
 
 [[package]]
 name = "automojo-waiting"
