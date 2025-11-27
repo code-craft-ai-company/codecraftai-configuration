@@ -28,20 +28,13 @@ from automojo.presence.presencevariables import (
 
 from automojo.configuration.constants import ConfigVariableDesc
 
-from automojo.configuration.normalize import (
-    split_and_normalize_name_list,
-    split_and_normalize_path_list,
-    split_and_normalize_source_list
-)
-
-from automojo.configuration.configurationsettings import AM_CONFIG_DEFAULTS
-
+from automojo.configuration.configurationsettings import ConfigurationDefaults
 
 class CONFIGURATION_MAPS:
     CREDENTIAL_CONFIGURATION_MAP = MergeMap()
     DATAPROFILE_CONFIGURATION_MAP = MergeMap()
     LANDSCAPE_CONFIGURATION_MAP = MergeMap()
-    RUNTIME_CONFIGURATION_MAP = MergeMap(AM_CONFIG_DEFAULTS.DEFAULT_CONFIGURATION)
+    RUNTIME_CONFIGURATION_MAP = MergeMap(ConfigurationDefaults.DEFAULT_CONFIGURATION)
     TOPOLOGY_CONFIGURATION_MAP = MergeMap()
 
 

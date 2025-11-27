@@ -17,7 +17,6 @@ from automojo.xmodules.xvariables import VariableDesc, VariableSource
 
 from automojo.presence.constants import PresenceVariableDesc
 from automojo.presence.contextpaths import ContextPaths
-from automojo.presence.presencevariables import PresenceVariables
 
 
 from automojo.configuration.normalize import (
@@ -43,13 +42,11 @@ class ConfigVariableDesc(PresenceVariableDesc):
     AM_CONFIG_STORAGE_URI = VariableDesc(context_path=ContextPaths.CONFIG_STORAGE_URI, default="")
 
 
-
     AM_CONFIG_CREDENTIAL_NAMES = VariableDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_NAMES, converter=split_and_normalize_name_list)
     AM_CONFIG_CREDENTIAL_FILES = VariableDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_FILES, converter=split_and_normalize_path_list)
     AM_CONFIG_CREDENTIAL_SOURCES = VariableDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_SOURCES, default="",
                                                 converter=split_and_normalize_source_list)
     
-
 
     AM_CONFIG_DATAPROFILE_NAMES = VariableDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_NAMES, converter=split_and_normalize_name_list)
     AM_CONFIG_DATAPROFILE_FILES = VariableDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_FILES, converter=split_and_normalize_path_list)
@@ -61,18 +58,15 @@ class ConfigVariableDesc(PresenceVariableDesc):
     AM_CONFIG_LANDSCAPE_SOURCES = VariableDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_SOURCES, default="")
     
 
-
     AM_CONFIG_TOPOLOGY_NAMES = VariableDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_NAMES, converter=split_and_normalize_name_list)
     AM_CONFIG_TOPOLOGY_FILES = VariableDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_FILES, converter=split_and_normalize_path_list)
     AM_CONFIG_TOPOLOGY_SOURCES = VariableDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_SOURCES, default="")
     
 
-
     AM_CONFIG_RUNTIME_NAMES = VariableDesc(context_path=ContextPaths.CONFIG_RUNTIME_NAMES, converter=split_and_normalize_name_list)
     AM_CONFIG_RUNTIME_FILES = VariableDesc(context_path=ContextPaths.CONFIG_RUNTIME_FILES, converter=split_and_normalize_path_list)
     AM_CONFIG_RUNTIME_SOURCES = VariableDesc(context_path=ContextPaths.CONFIG_RUNTIME_SOURCES, default="")
     
-
 
     AM_CONFIG_REQUIRE_CREDENTIALS = VariableDesc(default=False, converter=parse_bool)
     AM_CONFIG_REQUIRE_DATAPROFILES = VariableDesc(default=False, converter=parse_bool)
