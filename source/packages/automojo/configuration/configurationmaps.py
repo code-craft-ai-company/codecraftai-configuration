@@ -68,12 +68,12 @@ def resolve_configuration_maps(
     if use_runtime is None:
         use_runtime = ConfigVariables.AM_CONFIG_USE_RUNTIME
     else:
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_LANDSCAPE, use_runtime)
-    
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_RUNTIME, use_runtime)
+
     if use_topology is None:
         use_topology = ConfigVariables.AM_CONFIG_USE_TOPOLOGY
     else:
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_LANDSCAPE, use_topology)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_TOPOLOGY, use_topology)
 
 
     if keyphrase is None:
