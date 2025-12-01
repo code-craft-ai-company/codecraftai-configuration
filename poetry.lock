@@ -33,9 +33,9 @@ reference = "main"
 resolved_reference = "e59882495ee30c2c867b2c2d2247dc60963e908d"
 
 [[package]]
-name = "automojo-presence"
+name = "automojo-this-app"
 version = "0.0.1"
-description = "Automation Mojo - Presence Package"
+description = "Automation Mojo - This-App"
 category = "main"
 optional = false
 python-versions = ">=3.10,<4.0"
@@ -45,13 +45,12 @@ develop = false
 [package.dependencies]
 automojo-errors = {git = "https://github.com/automationmojo/automojo-errors.git", branch = "main"}
 automojo-extension = {git = "https://github.com/automationmojo/automojo-extension.git", branch = "main"}
-automojo-xmodules = {git = "https://github.com/automationmojo/automojo-xmodules.git", branch = "main"}
 
 [package.source]
 type = "git"
-url = "https://github.com/automationmojo/automojo-presence.git"
+url = "https://github.com/automationmojo/automojo-this-app.git"
 reference = "main"
-resolved_reference = "7f9634333e4b8452260cf70d78d4fdfc84b24e8a"
+resolved_reference = "b2c8e3a1d0e54fec1b2dfe6d7ead0bc18c4600b5"
 
 [[package]]
 name = "automojo-waiting"
@@ -706,4 +705,4 @@ pymongo = ["pymongo"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "c2c20e8ab97bb5810cf2e2ef12f167244a24a8df1cc0858cef9a25b85550c42f"
+content-hash = "2e74faa0d3fd59c53845ac363dcb58585017a7c2bd6af3b98b5316a9158844a2"

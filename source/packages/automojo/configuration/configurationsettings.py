@@ -14,9 +14,9 @@ __credits__ = []
 
 from typing import Optional
 
-from automojo.presence.wellknown import ThisApplicationSingleton
+from automojo.thisapp.wellknown import ThisApplicationSingleton
 
-from automojo.presence.presencesettings import establish_presence_settings, AM_PRESENCE_DEFAULTS
+from automojo.thisapp.persona import establish_app_persona
 
 default_config = {}
 
@@ -36,9 +36,9 @@ class ConfigurationDefaults:
 CONFIG_SETTINGS_ESTABLISHED = False
 
 
-def establish_configuration_settings(*, name: Optional[str]=None, home_dir: Optional[str]=None,  settings_file: Optional[str]=None,
-                                     extension_modules: Optional[str]=None, logger_name: Optional[str]=None, log_basename: Optional[str]=None,
-                                     log_directory: Optional[str]=None, service_name: Optional[str]=None, default_configuration: Optional[dict]=None,
+def establish_configuration_settings(*, name: Optional[str]=None, logger_name: Optional[str]=None, log_basename: Optional[str]=None,
+                                     presence_dir: Optional[str]=None, log_directory: Optional[str]=None,  settings_file: Optional[str]=None,
+                                     extensions: Optional[str]=None, service_name: Optional[str]=None, default_configuration: Optional[dict]=None,
                                     **other):
 
     global CONFIG_SETTINGS_ESTABLISHED
@@ -46,9 +46,8 @@ def establish_configuration_settings(*, name: Optional[str]=None, home_dir: Opti
     if not CONFIG_SETTINGS_ESTABLISHED:
         CONFIG_SETTINGS_ESTABLISHED = True
 
-        establish_presence_settings(name=name, home_dir=home_dir, settings_file=settings_file, extension_modules=extension_modules,
-                                    logger_name=logger_name, log_basename=log_basename, log_directory=log_directory,
-                                    service_name=service_name, **other)
+        establish_app_persona(name=name, logger_name=logger_name, log_basename=log_basename, presence_dir=presence_dir, log_directory=log_directory,
+                              settings_file=settings_file, extensions=extensions, service_name=service_name, **other)
 
         if default_configuration is not None:
             ConfigurationDefaults.DEFAULT_CONFIGURATION = default_configuration

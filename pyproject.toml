@@ -21,7 +21,9 @@ pyyaml = "^6.0.2"
 cryptography = "^45.0.5"
 requests = "^2.32.4"
 automojo-errors = { git = "https://github.com/automationmojo/automojo-errors.git", branch = "main" }
-automojo-presence = { git = "https://github.com/automationmojo/automojo-presence.git", branch = "main" }
+automojo-this-app = { git = "https://github.com/automationmojo/automojo-this-app.git", branch = "main" }
+automojo-xmodules = { git = "https://github.com/automationmojo/automojo-xmodules.git", branch = "main" }
+
 couchdb = { version="^1.2", optional = true}
 pymongo = { version="^4.13.2", optional = true }
 

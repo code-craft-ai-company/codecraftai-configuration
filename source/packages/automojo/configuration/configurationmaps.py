@@ -18,19 +18,15 @@ from collections import OrderedDict
 
 from automojo.errors.exceptions import SemanticError
 
-from automojo.xmodules.xcollections.context import Context
-from automojo.xmodules.xcollections.wellknown import ContextSingleton
-
-from automojo.presence.thisapplication import ThisApplication
-from automojo.presence.wellknown import ThisApplicationSingleton
-from automojo.presence.contextpaths import ContextPaths
+from automojo.thisapp.thisapplication import ThisApplication
+from automojo.thisapp.wellknown import ThisApplicationSingleton
 
 from automojo.configuration.configurationvariables import (
-    ConfigurationVariables,
+    ConfigVariables,
     CONFIGURATION_MAPS
 )
 
-from automojo.configuration.constants import ConfigVariableDesc
+from automojo.configuration.configurationvariables import ConfigVariablesDesc
 from automojo.configuration.configurationloader import ConfigurationLoader
 
 
@@ -55,38 +51,36 @@ def resolve_configuration_maps(
 
 
     if use_credentials is None:
-        use_credentials = ConfigurationVariables.AM_CONFIG_USE_CREDENTIALS
+        use_credentials = ConfigVariables.AM_CONFIG_USE_CREDENTIALS
     else:
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_USE_CREDENTIALS, use_credentials)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_CREDENTIALS, use_credentials)
 
     if use_dataprofiles is None:
-        use_dataprofiles = ConfigurationVariables.AM_CONFIG_USE_DATAPROFILES
+        use_dataprofiles = ConfigVariables.AM_CONFIG_USE_DATAPROFILES
     else:
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_USE_DATAPROFILES, use_dataprofiles)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_DATAPROFILES, use_dataprofiles)
     
     if use_landscape is None:
-        use_landscape = ConfigurationVariables.AM_CONFIG_USE_LANDSCAPE
+        use_landscape = ConfigVariables.AM_CONFIG_USE_LANDSCAPE
     else:
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_USE_LANDSCAPE, use_landscape)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_LANDSCAPE, use_landscape)
     
     if use_runtime is None:
-        use_runtime = ConfigurationVariables.AM_CONFIG_USE_RUNTIME
+        use_runtime = ConfigVariables.AM_CONFIG_USE_RUNTIME
     else:
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_USE_LANDSCAPE, use_runtime)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_LANDSCAPE, use_runtime)
     
     if use_topology is None:
-        use_topology = ConfigurationVariables.AM_CONFIG_USE_TOPOLOGY
+        use_topology = ConfigVariables.AM_CONFIG_USE_TOPOLOGY
     else:
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_USE_LANDSCAPE, use_topology)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_LANDSCAPE, use_topology)
 
 
     if keyphrase is None:
-        keyphrase = ConfigurationVariables.AM_CONFIG_PASS_PHRASE
+        keyphrase = ConfigVariables.AM_CONFIG_PASS_PHRASE
     else:
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_PASS_PHRASE, keyphrase)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_PASS_PHRASE, keyphrase)
 
-
-    ctx = ContextSingleton()
 
     if use_credentials:
         resolve_credentials_configuration(this_app, keyphrase=keyphrase, credentials=credentials)
@@ -114,16 +108,16 @@ def resolve_credentials_configuration(this_app: ThisApplication, keyphrase: Opti
  
     credential_uris = []
 
-    config_names = ConfigurationVariables.AM_CONFIG_CREDENTIAL_NAMES
-    config_files = ConfigurationVariables.AM_CONFIG_CREDENTIAL_FILES
+    config_names = ConfigVariables.AM_CONFIG_CREDENTIAL_NAMES
+    config_files = ConfigVariables.AM_CONFIG_CREDENTIAL_FILES
 
     # We were told to use credentials but we dont have any config_names or config_files, that means to use the default config.
     if (config_names is None or len(config_names) == 0) and (config_files is None or len(config_files) == 0):
         config_names = ["default-credentials"]
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_NAMES, config_names)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_NAMES, config_names)
 
     if config_names is not None:
-        source_bases = ConfigurationVariables.AM_CONFIG_CREDENTIAL_SOURCES
+        source_bases = ConfigVariables.AM_CONFIG_CREDENTIAL_SOURCES
         if source_bases is None:
             errmsg = "The 'AM_CONFIG_CREDENTIAL_SOURCES' variable should not be None.  Did you call 'resolve_configuration_variables'."
             raise SemanticError(errmsg)
@@ -143,7 +137,7 @@ def resolve_credentials_configuration(this_app: ThisApplication, keyphrase: Opti
             config_info = config_loader.load_configuration_from_file(cfile, keyphrase=keyphrase)
             CONFIGURATION_MAPS.CREDENTIAL_CONFIGURATION_MAP.maps.insert(0, config_info)
 
-    this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_URIS, credential_uris)
+    this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_URIS, credential_uris)
 
     return
 
@@ -156,16 +150,16 @@ def resolve_dataprofiles_configuration(this_app: ThisApplication, keyphrase: Opt
 
     dataprofiles_uris = []
 
-    config_names = ConfigurationVariables.AM_CONFIG_DATAPROFILE_NAMES
-    config_files = ConfigurationVariables.AM_CONFIG_DATAPROFILE_FILES
+    config_names = ConfigVariables.AM_CONFIG_DATAPROFILE_NAMES
+    config_files = ConfigVariables.AM_CONFIG_DATAPROFILE_FILES
 
     # We were told to use credentials but we dont have any config_names or config_files, that means to use the default config.
     if (config_names is None or len(config_names) == 0) and (config_files is None or len(config_files) == 0):
         config_names = ["default-dataprofiles"]
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_NAMES, config_names)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_NAMES, config_names)
 
     if config_names is not None:
-        source_bases = ConfigurationVariables.AM_CONFIG_DATAPROFILE_SOURCES
+        source_bases = ConfigVariables.AM_CONFIG_DATAPROFILE_SOURCES
         if source_bases is None:
             errmsg = "The 'AM_CONFIG_DATAPROFILE_SOURCES' variable should not be None.  Did you call 'resolve_configuration_variables'."
             raise SemanticError(errmsg)
@@ -185,7 +179,7 @@ def resolve_dataprofiles_configuration(this_app: ThisApplication, keyphrase: Opt
             config_info = config_loader.load_configuration_from_file(cfile, keyphrase=keyphrase)
             CONFIGURATION_MAPS.DATAPROFILE_CONFIGURATION_MAP.maps.insert(0, config_info)
 
-    this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_URIS, dataprofiles_uris)
+    this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_URIS, dataprofiles_uris)
 
     return
 
@@ -198,16 +192,16 @@ def resolve_landscape_configuration(this_app: ThisApplication, keyphrase: Option
 
     landscape_uris = []
 
-    config_names = ConfigurationVariables.AM_CONFIG_LANDSCAPE_NAMES
-    config_files = ConfigurationVariables.AM_CONFIG_LANDSCAPE_FILES
+    config_names = ConfigVariables.AM_CONFIG_LANDSCAPE_NAMES
+    config_files = ConfigVariables.AM_CONFIG_LANDSCAPE_FILES
 
     # We were told to use credentials but we dont have any config_names or config_files, that means to use the default config.
     if (config_names is None or len(config_names) == 0) and (config_files is None or len(config_files) == 0):
         config_names = ["default-landscape"]
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_NAMES, config_names)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_NAMES, config_names)
 
     if config_names is not None:
-        source_bases = ConfigurationVariables.AM_CONFIG_LANDSCAPE_SOURCES
+        source_bases = ConfigVariables.AM_CONFIG_LANDSCAPE_SOURCES
         if source_bases is None:
             errmsg = "The 'AM_CONFIG_LANDSCAPE_SOURCES' variable should not be None.  Did you call 'resolve_configuration_variables'."
             raise SemanticError(errmsg)
@@ -227,7 +221,7 @@ def resolve_landscape_configuration(this_app: ThisApplication, keyphrase: Option
             config_info = config_loader.load_configuration_from_file(cfile, keyphrase=keyphrase)
             CONFIGURATION_MAPS.LANDSCAPE_CONFIGURATION_MAP.maps.insert(0, config_info)
 
-    this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_URIS, landscape_uris)
+    this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_URIS, landscape_uris)
 
     return
 
@@ -240,16 +234,16 @@ def resolve_runtime_configuration(this_app: ThisApplication, keyphrase: Optional
 
     runtime_uris = []
 
-    config_names = ConfigurationVariables.AM_CONFIG_RUNTIME_NAMES
-    config_files = ConfigurationVariables.AM_CONFIG_RUNTIME_FILES
+    config_names = ConfigVariables.AM_CONFIG_RUNTIME_NAMES
+    config_files = ConfigVariables.AM_CONFIG_RUNTIME_FILES
 
     # We were told to use credentials but we dont have any config_names or config_files, that means to use the default config.
     if (config_names is None or len(config_names) == 0) and (config_files is None or len(config_files) == 0):
         config_names = ["default-runtime"]
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_NAMES, config_names)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_NAMES, config_names)
 
     if config_names is not None:
-        source_bases = ConfigurationVariables.AM_CONFIG_RUNTIME_SOURCES
+        source_bases = ConfigVariables.AM_CONFIG_RUNTIME_SOURCES
         if source_bases is None:
             errmsg = "The 'AM_CONFIG_RUNTIME_SOURCES' variable should not be None.  Did you call 'resolve_configuration_variables'."
             raise SemanticError(errmsg)
@@ -269,7 +263,7 @@ def resolve_runtime_configuration(this_app: ThisApplication, keyphrase: Optional
             config_info = config_loader.load_configuration_from_file(cfile, keyphrase=keyphrase)
             CONFIGURATION_MAPS.RUNTIME_CONFIGURATION_MAP.maps.insert(0, config_info)
 
-    this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_URIS, runtime_uris)
+    this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_URIS, runtime_uris)
 
     return
 
@@ -282,16 +276,16 @@ def resolve_topology_configuration(this_app: ThisApplication, keyphrase: Optiona
 
     topology_uris = []
 
-    config_names = ConfigurationVariables.AM_CONFIG_TOPOLOGY_NAMES
-    config_files = ConfigurationVariables.AM_CONFIG_TOPOLOGY_FILES
+    config_names = ConfigVariables.AM_CONFIG_TOPOLOGY_NAMES
+    config_files = ConfigVariables.AM_CONFIG_TOPOLOGY_FILES
 
     # We were told to use credentials but we dont have any config_names or config_files, that means to use the default config.
     if (config_names is None or len(config_names) == 0) and (config_files is None or len(config_files) == 0):
         config_names = ["default-topology"]
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_NAMES, config_names)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_NAMES, config_names)
 
     if config_names is not None:
-        source_bases = ConfigurationVariables.AM_CONFIG_TOPOLOGY_SOURCES
+        source_bases = ConfigVariables.AM_CONFIG_TOPOLOGY_SOURCES
         if source_bases is None:
             errmsg = "The 'AM_CONFIG_TOPOLOGY_SOURCES' variable should not be None.  Did you call 'resolve_configuration_variables'."
             raise SemanticError(errmsg)
@@ -311,7 +305,7 @@ def resolve_topology_configuration(this_app: ThisApplication, keyphrase: Optiona
             config_info = config_loader.load_configuration_from_file(cfile, keyphrase=keyphrase)
             CONFIGURATION_MAPS.TOPOLOGY_CONFIGURATION_MAP.maps.insert(0, config_info)
 
-    this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_URIS, topology_uris)
+    this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_URIS, topology_uris)
 
     #ctx.insert(ContextPaths.CONFIG_TOPOLOGY, CONFIGURATION_MAPS.TOPOLOGY_CONFIGURATION_MAP)
     

@@ -13,9 +13,9 @@ __credits__ = []
 
 from typing import List
 
-from automojo.presence.wellknown import ThisApplicationSingleton
+from automojo.thisapp.wellknown import ThisApplicationSingleton
 
-from automojo.configuration.constants import ConfigVariableDesc
+from automojo.configuration.configurationvariables import ConfigVariablesDesc
 
 class ConfigOptionOverrides:
 
@@ -29,8 +29,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
     
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_NAMES, credential_names)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS, True)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_NAMES, credential_names)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_CREDENTIALS, True)
         
         return
 
@@ -44,7 +44,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES, sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES, sources)
         return
 
     @staticmethod
@@ -57,8 +57,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES, filepaths)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS, True)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_CREDENTIALS, True)
         return
     
     @staticmethod
@@ -71,8 +71,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
         
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_NAMES, dataprofile_names)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES, True)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_NAMES, dataprofile_names)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_DATAPROFILES, True)
         
         return
 
@@ -86,7 +86,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES, sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES, sources)
         return
 
     @staticmethod
@@ -99,8 +99,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES, filepaths)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES, True)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_DATAPROFILES, True)
         return
 
     @staticmethod
@@ -113,8 +113,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
         
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_NAMES, landscape_names)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE, True)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_NAMES, landscape_names)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_LANDSCAPE, True)
         return
 
     @staticmethod
@@ -127,7 +127,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES, sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES, sources)
         return
 
     @staticmethod
@@ -140,8 +140,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES, filepaths)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE, True)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_LANDSCAPE, True)
         return
 
     @staticmethod
@@ -154,8 +154,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
         
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_NAMES, runtime_names)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME, True)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_NAMES, runtime_names)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_RUNTIME, True)
         return
 
     @staticmethod
@@ -169,7 +169,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES, sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES, sources)
         return
 
     @staticmethod
@@ -182,8 +182,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES, filepaths)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME, True)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_RUNTIME, True)
         return
 
 
@@ -197,8 +197,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
         
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_NAMES, topology_names)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY, True)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_NAMES, topology_names)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_TOPOLOGY, True)
         return
 
     @staticmethod
@@ -211,7 +211,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES, sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES, sources)
         return
 
     @staticmethod
@@ -224,8 +224,8 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES, filepaths)
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY, True)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_TOPOLOGY, True)
         return
 
     @staticmethod
@@ -244,10 +244,10 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS, repr(require_credentials))
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE, repr(require_landscape))
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME, repr(require_runtime))
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY, repr(require_topology))
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES, repr(require_dataprofiles))
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_CREDENTIALS, repr(require_credentials))
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_LANDSCAPE, repr(require_landscape))
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_RUNTIME, repr(require_runtime))
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_TOPOLOGY, repr(require_topology))
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_DATAPROFILES, repr(require_dataprofiles))
         
         return

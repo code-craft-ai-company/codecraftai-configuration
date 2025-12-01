@@ -17,18 +17,22 @@ import os
 from automojo.xmodules.xcollections.mergemap import MergeMap
 from automojo.xmodules.xconvert import parse_bool
 
-from automojo.presence.wellknown import ContextSingleton, ThisApplicationSingleton
-from automojo.presence.contextpaths import ContextPaths
-from automojo.presence.appvarreader import AppVarReader
+from automojo.thisapp.wellknown import ThisApplicationSingleton
+from automojo.thisapp.appvardesc import AppVarDesc, VariableSource
+from automojo.thisapp.appvaraccessor import AppVarAccessor
 
-from automojo.presence.presencevariables import (
-    PresenceVariables,
-    resolve_presence_variables
-)
-
-from automojo.configuration.constants import ConfigVariableDesc
+from automojo.thisapp.personavariables import PersonaVariablesDesc, PersonaVariables
 
 from automojo.configuration.configurationsettings import ConfigurationDefaults
+from automojo.configuration.contextpaths import ContextPaths
+from automojo.configuration.wellknown import ContextSingleton
+
+from automojo.configuration.normalize import (
+    split_and_normalize_name_list,
+    split_and_normalize_path_list,
+    split_and_normalize_source_list
+)
+
 
 class CONFIGURATION_MAPS:
     CREDENTIAL_CONFIGURATION_MAP = MergeMap()
@@ -39,62 +43,123 @@ class CONFIGURATION_MAPS:
 
 
 
-class ConfigurationVariables(PresenceVariables):
+DEFAULT_CONFIGURATION = {
+    "version": "1.0.0",
+    "logging": {
+        "levels": {
+            "console": "INFO",
+            "logfile": "DEBUG"
+        }
+    }
+}
 
-    AM_CONFIG_REQUIRE_CREDENTIALS = AppVarReader(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS)
-    AM_CONFIG_REQUIRE_DATAPROFILES = AppVarReader(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES)
-    AM_CONFIG_REQUIRE_LANDSCAPE = AppVarReader(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE)
-    AM_CONFIG_REQUIRE_RUNTIME = AppVarReader(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME)
-    AM_CONFIG_REQUIRE_TOPOLOGY = AppVarReader(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY)
+class ConfigVariablesDesc(PersonaVariablesDesc):
 
-    AM_CONFIG_STORAGE_URI = AppVarReader(ConfigVariableDesc.AM_CONFIG_STORAGE_URI)
+    AM_CONFIG_DIRECTORY = AppVarDesc(default=os.path.join(PersonaVariablesDesc.AP_PRESENCE_DIR.default, "config"))
+    AM_CONFIG_PASS_PHRASE = AppVarDesc()
+    AM_CONFIG_STORAGE_URI = AppVarDesc(context_path=ContextPaths.CONFIG_STORAGE_URI, default="")
 
-    AM_CONFIG_USE_CREDENTIALS = AppVarReader(ConfigVariableDesc.AM_CONFIG_USE_CREDENTIALS)
-    AM_CONFIG_USE_DATAPROFILES = AppVarReader(ConfigVariableDesc.AM_CONFIG_USE_DATAPROFILES)
-    AM_CONFIG_USE_LANDSCAPE = AppVarReader(ConfigVariableDesc.AM_CONFIG_USE_LANDSCAPE)
-    AM_CONFIG_USE_RUNTIME = AppVarReader(ConfigVariableDesc.AM_CONFIG_USE_RUNTIME)
-    AM_CONFIG_USE_TOPOLOGY = AppVarReader(ConfigVariableDesc.AM_CONFIG_USE_CREDENTIALS)
 
-    AM_CONFIG_DIRECTORY = AppVarReader(ConfigVariableDesc.AM_CONFIG_DIRECTORY)
+    AM_CONFIG_CREDENTIAL_NAMES = AppVarDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_CREDENTIAL_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_CREDENTIAL_SOURCES = AppVarDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_SOURCES, default="",
+                                                converter=split_and_normalize_source_list)
+    
 
-    AM_CONFIG_PASS_PHRASE = AppVarReader(ConfigVariableDesc.AM_CONFIG_PASS_PHRASE)
+    AM_CONFIG_DATAPROFILE_NAMES = AppVarDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_DATAPROFILE_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_DATAPROFILE_SOURCES = AppVarDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_SOURCES, default="")
+    
 
-    AM_CONFIG_CREDENTIAL_NAMES = AppVarReader(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_NAMES)
-    AM_CONFIG_CREDENTIAL_URIS = AppVarReader(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_URIS)
-    AM_CONFIG_CREDENTIAL_SOURCES = AppVarReader(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES)
-    AM_CONFIG_CREDENTIAL_FILES = AppVarReader(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_FILES)
+    AM_CONFIG_LANDSCAPE_NAMES = AppVarDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_LANDSCAPE_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_LANDSCAPE_SOURCES = AppVarDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_SOURCES, default="")
+    
 
-    AM_CONFIG_DATAPROFILE_NAMES = AppVarReader(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_NAMES)
-    AM_CONFIG_DATAPROFILE_URIS = AppVarReader(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_URIS)
-    AM_CONFIG_DATAPROFILE_SOURCES = AppVarReader(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES)
-    AM_CONFIG_DATAPROFILE_FILES = AppVarReader(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_FILES)
+    AM_CONFIG_TOPOLOGY_NAMES = AppVarDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_TOPOLOGY_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_TOPOLOGY_SOURCES = AppVarDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_SOURCES, default="")
+    
 
-    AM_CONFIG_LANDSCAPE_NAMES = AppVarReader(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_NAMES)
-    AM_CONFIG_LANDSCAPE_URIS = AppVarReader(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_URIS)
-    AM_CONFIG_LANDSCAPE_SOURCES = AppVarReader(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES)
-    AM_CONFIG_LANDSCAPE_FILES = AppVarReader(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_FILES)
+    AM_CONFIG_RUNTIME_NAMES = AppVarDesc(context_path=ContextPaths.CONFIG_RUNTIME_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_RUNTIME_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_RUNTIME_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_RUNTIME_SOURCES = AppVarDesc(context_path=ContextPaths.CONFIG_RUNTIME_SOURCES, default="")
+    
 
-    AM_CONFIG_TOPOLOGY_NAMES = AppVarReader(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_NAMES)
-    AM_CONFIG_TOPOLOGY_URIS = AppVarReader(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_URIS)
-    AM_CONFIG_TOPOLOGY_SOURCES = AppVarReader(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES)
-    AM_CONFIG_TOPOLOGY_FILES = AppVarReader(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_FILES)
+    AM_CONFIG_REQUIRE_CREDENTIALS = AppVarDesc(default=False, converter=parse_bool)
+    AM_CONFIG_REQUIRE_DATAPROFILES = AppVarDesc(default=False, converter=parse_bool)
+    AM_CONFIG_REQUIRE_LANDSCAPE = AppVarDesc(default=False, converter=parse_bool)
+    AM_CONFIG_REQUIRE_RUNTIME = AppVarDesc(default=False, converter=parse_bool)
+    AM_CONFIG_REQUIRE_TOPOLOGY = AppVarDesc(default=False, converter=parse_bool)
 
-    AM_CONFIG_RUNTIME_NAMES = AppVarReader(ConfigVariableDesc.AM_CONFIG_RUNTIME_NAMES)
-    AM_CONFIG_RUNTIME_URIS = AppVarReader(ConfigVariableDesc.AM_CONFIG_RUNTIME_URIS)
-    AM_CONFIG_RUNTIME_SOURCES = AppVarReader(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES)
-    AM_CONFIG_RUNTIME_FILES = AppVarReader(ConfigVariableDesc.AM_CONFIG_RUNTIME_FILES)
+
+    AM_CONFIG_USE_CREDENTIALS = AppVarDesc(default=False, source=VariableSource.NONE)
+    AM_CONFIG_USE_DATAPROFILES = AppVarDesc(default=False, source=VariableSource.NONE)
+    AM_CONFIG_USE_LANDSCAPE = AppVarDesc(default=False, source=VariableSource.NONE)
+    AM_CONFIG_USE_RUNTIME = AppVarDesc(default=False, source=VariableSource.NONE)
+    AM_CONFIG_USE_TOPOLOGY = AppVarDesc(default=False, source=VariableSource.NONE)
+
+
+    AM_CONFIG_CREDENTIAL_URIS = AppVarDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_URIS, source=VariableSource.NONE)
+    AM_CONFIG_DATAPROFILE_URIS = AppVarDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_URIS, source=VariableSource.NONE)
+    AM_CONFIG_LANDSCAPE_URIS = AppVarDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_URIS, source=VariableSource.NONE)
+    AM_CONFIG_TOPOLOGY_URIS = AppVarDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_URIS, source=VariableSource.NONE)
+    AM_CONFIG_RUNTIME_URIS = AppVarDesc(context_path=ContextPaths.CONFIG_RUNTIME_URIS, source=VariableSource.NONE)
+
+
+
+class ConfigVariables(PersonaVariables):
+
+    AM_CONFIG_REQUIRE_CREDENTIALS = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_REQUIRE_CREDENTIALS)
+    AM_CONFIG_REQUIRE_DATAPROFILES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_REQUIRE_DATAPROFILES)
+    AM_CONFIG_REQUIRE_LANDSCAPE = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_REQUIRE_LANDSCAPE)
+    AM_CONFIG_REQUIRE_RUNTIME = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_REQUIRE_RUNTIME)
+    AM_CONFIG_REQUIRE_TOPOLOGY = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_REQUIRE_TOPOLOGY)
+
+    AM_CONFIG_STORAGE_URI = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_STORAGE_URI)
+
+    AM_CONFIG_USE_CREDENTIALS = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_USE_CREDENTIALS)
+    AM_CONFIG_USE_DATAPROFILES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_USE_DATAPROFILES)
+    AM_CONFIG_USE_LANDSCAPE = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_USE_LANDSCAPE)
+    AM_CONFIG_USE_RUNTIME = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_USE_RUNTIME)
+    AM_CONFIG_USE_TOPOLOGY = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_USE_CREDENTIALS)
+
+    AM_CONFIG_DIRECTORY = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_DIRECTORY)
+
+    AM_CONFIG_PASS_PHRASE = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_PASS_PHRASE)
+
+    AM_CONFIG_CREDENTIAL_NAMES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_NAMES)
+    AM_CONFIG_CREDENTIAL_URIS = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_URIS)
+    AM_CONFIG_CREDENTIAL_SOURCES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES)
+    AM_CONFIG_CREDENTIAL_FILES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_FILES)
+
+    AM_CONFIG_DATAPROFILE_NAMES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_NAMES)
+    AM_CONFIG_DATAPROFILE_URIS = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_URIS)
+    AM_CONFIG_DATAPROFILE_SOURCES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES)
+    AM_CONFIG_DATAPROFILE_FILES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_FILES)
+
+    AM_CONFIG_LANDSCAPE_NAMES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_NAMES)
+    AM_CONFIG_LANDSCAPE_URIS = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_URIS)
+    AM_CONFIG_LANDSCAPE_SOURCES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES)
+    AM_CONFIG_LANDSCAPE_FILES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_FILES)
+
+    AM_CONFIG_TOPOLOGY_NAMES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_NAMES)
+    AM_CONFIG_TOPOLOGY_URIS = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_URIS)
+    AM_CONFIG_TOPOLOGY_SOURCES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES)
+    AM_CONFIG_TOPOLOGY_FILES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_FILES)
+
+    AM_CONFIG_RUNTIME_NAMES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_RUNTIME_NAMES)
+    AM_CONFIG_RUNTIME_URIS = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_RUNTIME_URIS)
+    AM_CONFIG_RUNTIME_SOURCES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES)
+    AM_CONFIG_RUNTIME_FILES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_RUNTIME_FILES)
 
 
 def resolve_configuration_variables():
 
-    # We need to resolve extension variables because we are
-    # dependent on some of them.
-    resolve_presence_variables()
-
     environ = os.environ
 
     this_app = ThisApplicationSingleton()
-    this_app.resolve_variable_set(ConfigVariableDesc)
+    this_app.resolve_variable_set(ConfigVariablesDesc)
 
     ctx = ContextSingleton()
 
@@ -106,16 +171,16 @@ def resolve_configuration_variables():
     ctx.insert(ContextPaths.CONFIG_TOPOLOGY, CONFIGURATION_MAPS.TOPOLOGY_CONFIGURATION_MAP)
     ctx.insert(ContextPaths.CONFIG_RUNTIME, CONFIGURATION_MAPS.RUNTIME_CONFIGURATION_MAP)
 
-    config_directory =  this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_DIRECTORY)
+    config_directory =  this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DIRECTORY)
 
     # ====================== PROCESS CREDENTIAL VARIABLES ==============================
 
     use_credentials = False
 
-    credential_files = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_FILES)
-    credential_names = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_NAMES)
-    credential_sources = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES)
-    require_credentials = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_CREDENTIALS)
+    credential_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_FILES)
+    credential_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_NAMES)
+    credential_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES)
+    require_credentials = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_CREDENTIALS)
 
     if len(credential_files) > 0 or len(credential_names) > 0 or require_credentials:
         use_credentials = True
@@ -125,13 +190,13 @@ def resolve_configuration_variables():
         credential_sources = [
             os.path.join(config_directory, "credentials")
         ]
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_CREDENTIAL_SOURCES, credential_sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES, credential_sources)
 
 
     if len(credential_files) > 0 or require_credentials:
         use_credentials = True
         
-    this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_USE_CREDENTIALS, use_credentials)
+    this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_CREDENTIALS, use_credentials)
     
 
     # ====================== PROCESS DATAPROFILE VARIABLES ==============================
@@ -139,10 +204,10 @@ def resolve_configuration_variables():
 
     use_dataprofiles = False
 
-    dataprofile_files = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_FILES)
-    dataprofile_names = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_NAMES)
-    dataprofile_sources = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES)
-    require_dataprofiles = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_DATAPROFILES)
+    dataprofile_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_FILES)
+    dataprofile_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_NAMES)
+    dataprofile_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES)
+    require_dataprofiles = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_DATAPROFILES)
 
     if len(dataprofile_files) > 0 or len(dataprofile_names) > 0:
         use_dataprofiles = True
@@ -152,13 +217,13 @@ def resolve_configuration_variables():
         dataprofile_sources = [
             os.path.join(config_directory, "dataprofiles")
         ]
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_DATAPROFILE_SOURCES, dataprofile_sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES, dataprofile_sources)
 
 
     if len(dataprofile_files) > 0 or require_dataprofiles:
         use_dataprofiles = True
         
-    this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_USE_DATAPROFILES, use_dataprofiles)
+    this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_DATAPROFILES, use_dataprofiles)
 
 
     # ====================== PROCESS LANDSCAPE VARIABLES ==============================
@@ -166,10 +231,10 @@ def resolve_configuration_variables():
 
     use_landscapes = False
 
-    landscape_files = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_FILES)
-    landscape_names = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_NAMES)
-    landscape_sources = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES)
-    require_landscape = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_LANDSCAPE)
+    landscape_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_FILES)
+    landscape_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_NAMES)
+    landscape_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES)
+    require_landscape = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_LANDSCAPE)
 
     if len(landscape_files) > 0 or len(landscape_names) > 0:
         use_landscapes = True
@@ -179,13 +244,13 @@ def resolve_configuration_variables():
         landscape_sources = [
             os.path.join(config_directory, "landscapes")
         ]
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_LANDSCAPE_SOURCES, landscape_sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES, landscape_sources)
 
 
     if len(landscape_files) > 0 or require_landscape:
         use_landscapes = True
         
-    this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_USE_LANDSCAPE, use_landscapes)
+    this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_LANDSCAPE, use_landscapes)
 
     
     # ====================== PROCESS RUNTIME VARIABLES ==============================
@@ -193,10 +258,10 @@ def resolve_configuration_variables():
 
     use_runtimes = False
 
-    runtime_files = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_FILES)
-    runtime_names = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_NAMES)
-    runtime_sources = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES)
-    require_runtime = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_RUNTIME)
+    runtime_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_FILES)
+    runtime_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_NAMES)
+    runtime_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES)
+    require_runtime = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_RUNTIME)
 
     if len(runtime_files) > 0 or len(runtime_names) > 0:
         use_runtimes = True
@@ -206,13 +271,13 @@ def resolve_configuration_variables():
         runtime_sources = [
             os.path.join(config_directory, "runtimes")
         ]
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_RUNTIME_SOURCES, runtime_sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES, runtime_sources)
 
 
     if len(runtime_files) > 0 or require_runtime:
         use_runtimes = True
         
-    this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_USE_RUNTIME, use_runtimes)
+    this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_RUNTIME, use_runtimes)
 
 
     # ====================== PROCESS TOPOLOGY VARIABLES ==============================
@@ -220,10 +285,10 @@ def resolve_configuration_variables():
 
     use_topology = False
 
-    topology_files = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_FILES)
-    topology_names = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_NAMES)
-    topology_sources = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES)
-    require_topology = this_app.get_variable_value(ConfigVariableDesc.AM_CONFIG_REQUIRE_TOPOLOGY)
+    topology_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_FILES)
+    topology_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_NAMES)
+    topology_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES)
+    require_topology = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_TOPOLOGY)
 
     if len(topology_files) > 0 or len(topology_names) > 0:
         use_runtimes = True
@@ -233,13 +298,13 @@ def resolve_configuration_variables():
         topology_sources = [
             os.path.join(config_directory, "topologies")
         ]
-        this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_TOPOLOGY_SOURCES, topology_sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES, topology_sources)
 
 
     if len(topology_files) > 0 or require_topology:
         use_topology = True
         
-    this_app.override_variable_value(ConfigVariableDesc.AM_CONFIG_USE_TOPOLOGY, use_topology)
+    this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_TOPOLOGY, use_topology)
 
 
     return
