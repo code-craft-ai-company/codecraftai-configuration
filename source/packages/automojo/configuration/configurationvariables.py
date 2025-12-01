@@ -122,7 +122,7 @@ class ConfigVariables(PersonaVariables):
     AM_CONFIG_USE_DATAPROFILES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_USE_DATAPROFILES)
     AM_CONFIG_USE_LANDSCAPE = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_USE_LANDSCAPE)
     AM_CONFIG_USE_RUNTIME = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_USE_RUNTIME)
-    AM_CONFIG_USE_TOPOLOGY = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_USE_CREDENTIALS)
+    AM_CONFIG_USE_TOPOLOGY = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_USE_TOPOLOGY)
 
     AM_CONFIG_DIRECTORY = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_DIRECTORY)
 
@@ -291,7 +291,7 @@ def resolve_configuration_variables():
     require_topology = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_TOPOLOGY)
 
     if len(topology_files) > 0 or len(topology_names) > 0:
-        use_runtimes = True
+        use_topology = True
 
 
     if len(topology_names) > 0 and len(topology_sources) == 0:
