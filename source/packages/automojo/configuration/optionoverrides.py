@@ -57,7 +57,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_FILES, filepaths)
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_CREDENTIALS, True)
         return
     
@@ -99,7 +99,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_FILES, filepaths)
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_DATAPROFILES, True)
         return
 
@@ -140,7 +140,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_FILES, filepaths)
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_LANDSCAPE, True)
         return
 
@@ -182,7 +182,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_FILES, filepaths)
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_RUNTIME, True)
         return
 
@@ -224,7 +224,7 @@ class ConfigOptionOverrides:
         """
         this_app = ThisApplicationSingleton()
 
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES, filepaths)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_FILES, filepaths)
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_TOPOLOGY, True)
         return
 
