@@ -14,7 +14,6 @@ __credits__ = []
 
 from typing import Optional
 
-from automojo.thisapp.wellknown import ThisApplicationSingleton
 
 from automojo.thisapp.persona import establish_app_persona
 

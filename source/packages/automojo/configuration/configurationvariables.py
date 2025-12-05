@@ -20,12 +20,12 @@ from automojo.xmodules.xconvert import parse_bool
 from automojo.thisapp.wellknown import ThisApplicationSingleton
 from automojo.thisapp.appvardesc import AppVarDesc, VariableSource
 from automojo.thisapp.appvaraccessor import AppVarAccessor
+from automojo.thisapp.contextpaths import ContextPaths
 
 from automojo.thisapp.personavariables import PersonaVariablesDesc, PersonaVariables
 
 from automojo.configuration.configurationsettings import ConfigurationDefaults
-from automojo.configuration.contextpaths import ContextPaths
-from automojo.configuration.wellknown import ContextSingleton
+
 
 from automojo.configuration.normalize import (
     split_and_normalize_name_list,
@@ -55,7 +55,7 @@ DEFAULT_CONFIGURATION = {
 
 class ConfigVariablesDesc(PersonaVariablesDesc):
 
-    AM_CONFIG_DIRECTORY = AppVarDesc(default=os.path.join(PersonaVariablesDesc.AP_PRESENCE_DIR.default, "config"))
+    AM_CONFIG_DIRECTORY = AppVarDesc(default=os.path.join(PersonaVariablesDesc.AM_PRESENCE_DIR.default, "config"))
     AM_CONFIG_PASS_PHRASE = AppVarDesc()
     AM_CONFIG_STORAGE_URI = AppVarDesc(context_path=ContextPaths.CONFIG_STORAGE_URI, default="")
 
@@ -156,12 +156,10 @@ class ConfigVariables(PersonaVariables):
 
 def resolve_configuration_variables():
 
-    environ = os.environ
-
     this_app = ThisApplicationSingleton()
     this_app.resolve_variable_set(ConfigVariablesDesc)
 
-    ctx = ContextSingleton()
+    ctx = this_app.context
 
     # For now, we don't want to put the CREDENTIALS CONFIGURATION into the context, because at the moment we don't 
     # want to pass it around in the plain.  Possibly what we can do is create a version of MergeMap that will serialize
