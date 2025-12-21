@@ -204,10 +204,6 @@ def resolve_configuration_variables():
             os.path.join(config_directory, "credentials")
         ]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES, credential_sources)
-
-
-    if len(credential_files) > 0 or require_credentials:
-        use_credentials = True
         
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_CREDENTIALS, use_credentials)
     
@@ -232,10 +228,6 @@ def resolve_configuration_variables():
             os.path.join(config_directory, "dataprofiles")
         ]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES, dataprofile_sources)
-
-
-    if len(dataprofile_files) > 0 or require_dataprofiles:
-        use_dataprofiles = True
         
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_DATAPROFILES, use_dataprofiles)
 
@@ -260,10 +252,6 @@ def resolve_configuration_variables():
             os.path.join(config_directory, "landscapes")
         ]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES, landscape_sources)
-
-
-    if len(landscape_files) > 0 or require_landscape:
-        use_landscapes = True
         
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_LANDSCAPE, use_landscapes)
 
@@ -288,10 +276,6 @@ def resolve_configuration_variables():
             os.path.join(config_directory, "runtimes")
         ]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES, runtime_sources)
-
-
-    if len(runtime_files) > 0 or require_runtime:
-        use_runtimes = True
         
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_RUNTIME, use_runtimes)
 
@@ -316,10 +300,6 @@ def resolve_configuration_variables():
             os.path.join(config_directory, "topologies")
         ]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES, topology_sources)
-
-
-    if len(topology_files) > 0 or require_topology:
-        use_topology = True
         
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_TOPOLOGY, use_topology)
 
