@@ -158,7 +158,17 @@ class ConfigVariables(PersonaVariables):
     AM_CONFIG_RUNTIME_FILES = AppVarAccessor(ConfigVariablesDesc.AM_CONFIG_RUNTIME_FILES)
 
 
+CONFIGURATION_VARIABLES_RESOLVED = False
+
+
 def resolve_configuration_variables():
+
+    global CONFIGURATION_VARIABLES_RESOLVED
+
+    if CONFIGURATION_VARIABLES_RESOLVED:
+        return
+    
+    CONFIGURATION_VARIABLES_RESOLVED = True
 
     this_app = ThisApplicationSingleton()
     this_app.resolve_variable_set(ConfigVariablesDesc)
