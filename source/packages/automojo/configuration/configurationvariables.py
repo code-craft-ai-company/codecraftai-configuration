@@ -194,7 +194,8 @@ def resolve_configuration_variables():
     credential_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES)
     require_credentials = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_CREDENTIALS)
 
-    if len(credential_files) > 0 or len(credential_names) > 0 or require_credentials:
+    if (credential_files is not None and len(credential_files) > 0) or (credential_names is not None and len(credential_names) > 0) or \
+        require_credentials:
         use_credentials = True
 
 
@@ -221,7 +222,8 @@ def resolve_configuration_variables():
     dataprofile_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES)
     require_dataprofiles = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_DATAPROFILES)
 
-    if len(dataprofile_files) > 0 or len(dataprofile_names) > 0:
+    if (dataprofile_files is not None and len(dataprofile_files) > 0) or (dataprofile_names is not None and len(dataprofile_names) > 0) or \
+        require_dataprofiles:
         use_dataprofiles = True
 
 
@@ -248,7 +250,8 @@ def resolve_configuration_variables():
     landscape_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES)
     require_landscape = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_LANDSCAPE)
 
-    if len(landscape_files) > 0 or len(landscape_names) > 0:
+    if (landscape_files is not None and len(landscape_files)) > 0 or (landscape_names is not None and len(landscape_names) > 0) or \
+        require_landscape:
         use_landscapes = True
 
 
@@ -275,7 +278,8 @@ def resolve_configuration_variables():
     runtime_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES)
     require_runtime = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_RUNTIME)
 
-    if len(runtime_files) > 0 or len(runtime_names) > 0:
+    if (runtime_files is not None and len(runtime_files) > 0) or (runtime_names is not None and len(runtime_names) > 0) or \
+        require_runtime:
         use_runtimes = True
 
 
@@ -302,7 +306,8 @@ def resolve_configuration_variables():
     topology_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES)
     require_topology = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_TOPOLOGY)
 
-    if len(topology_files) > 0 or len(topology_names) > 0:
+    if (topology_files is not None and len(topology_files) > 0) or (topology_names is not None and len(topology_names) > 0) or \
+        require_topology:
         use_topology = True
 
 
