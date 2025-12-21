@@ -64,30 +64,30 @@ class ConfigVariablesDesc(PersonaVariablesDesc):
     AM_CONFIG_STORAGE_URI = AppVarDesc(context_path=ContextPaths.CONFIG_STORAGE_URI, default="")
 
 
-    AM_CONFIG_CREDENTIAL_NAMES = AppVarDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_NAMES, converter=split_and_normalize_name_list)
-    AM_CONFIG_CREDENTIAL_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_FILES, converter=split_and_normalize_path_list)
-    AM_CONFIG_CREDENTIAL_SOURCES = AppVarDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_SOURCES, default="",
+    AM_CONFIG_CREDENTIAL_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_CREDENTIAL_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_CREDENTIAL_FILES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_CREDENTIAL_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_CREDENTIAL_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_CREDENTIAL_SOURCES,
                                                 converter=split_and_normalize_source_list)
     
 
-    AM_CONFIG_DATAPROFILE_NAMES = AppVarDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_DATAPROFILE_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_DATAPROFILE_NAMES, converter=split_and_normalize_name_list)
     AM_CONFIG_DATAPROFILE_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_FILES, converter=split_and_normalize_path_list)
-    AM_CONFIG_DATAPROFILE_SOURCES = AppVarDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_SOURCES, default="")
+    AM_CONFIG_DATAPROFILE_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_DATAPROFILE_SOURCES)
     
 
-    AM_CONFIG_LANDSCAPE_NAMES = AppVarDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_NAMES, converter=split_and_normalize_name_list)
-    AM_CONFIG_LANDSCAPE_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_FILES, converter=split_and_normalize_path_list)
-    AM_CONFIG_LANDSCAPE_SOURCES = AppVarDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_SOURCES, default="")
+    AM_CONFIG_LANDSCAPE_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_LANDSCAPE_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_LANDSCAPE_FILES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_LANDSCAPE_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_LANDSCAPE_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_LANDSCAPE_SOURCES)
     
 
-    AM_CONFIG_TOPOLOGY_NAMES = AppVarDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_NAMES, converter=split_and_normalize_name_list)
-    AM_CONFIG_TOPOLOGY_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_FILES, converter=split_and_normalize_path_list)
-    AM_CONFIG_TOPOLOGY_SOURCES = AppVarDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_SOURCES, default="")
+    AM_CONFIG_TOPOLOGY_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_TOPOLOGY_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_TOPOLOGY_FILES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_TOPOLOGY_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_TOPOLOGY_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_TOPOLOGY_SOURCES)
     
 
-    AM_CONFIG_RUNTIME_NAMES = AppVarDesc(context_path=ContextPaths.CONFIG_RUNTIME_NAMES, converter=split_and_normalize_name_list)
-    AM_CONFIG_RUNTIME_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_RUNTIME_FILES, converter=split_and_normalize_path_list)
-    AM_CONFIG_RUNTIME_SOURCES = AppVarDesc(context_path=ContextPaths.CONFIG_RUNTIME_SOURCES, default="")
+    AM_CONFIG_RUNTIME_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_RUNTIME_NAMES, converter=split_and_normalize_name_list)
+    AM_CONFIG_RUNTIME_FILES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_RUNTIME_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_RUNTIME_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_RUNTIME_SOURCES)
     
 
     AM_CONFIG_REQUIRE_CREDENTIALS = AppVarDesc(default=False, converter=parse_bool)
@@ -104,11 +104,11 @@ class ConfigVariablesDesc(PersonaVariablesDesc):
     AM_CONFIG_USE_TOPOLOGY = AppVarDesc(default=False, source=VariableSource.NONE)
 
 
-    AM_CONFIG_CREDENTIAL_URIS = AppVarDesc(context_path=ContextPaths.CONFIG_CREDENTIAL_URIS, source=VariableSource.NONE)
-    AM_CONFIG_DATAPROFILE_URIS = AppVarDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_URIS, source=VariableSource.NONE)
-    AM_CONFIG_LANDSCAPE_URIS = AppVarDesc(context_path=ContextPaths.CONFIG_LANDSCAPE_URIS, source=VariableSource.NONE)
-    AM_CONFIG_TOPOLOGY_URIS = AppVarDesc(context_path=ContextPaths.CONFIG_TOPOLOGY_URIS, source=VariableSource.NONE)
-    AM_CONFIG_RUNTIME_URIS = AppVarDesc(context_path=ContextPaths.CONFIG_RUNTIME_URIS, source=VariableSource.NONE)
+    AM_CONFIG_CREDENTIAL_URIS = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_CREDENTIAL_URIS, source=VariableSource.NONE)
+    AM_CONFIG_DATAPROFILE_URIS = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_DATAPROFILE_URIS, source=VariableSource.NONE)
+    AM_CONFIG_LANDSCAPE_URIS = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_LANDSCAPE_URIS, source=VariableSource.NONE)
+    AM_CONFIG_TOPOLOGY_URIS = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_TOPOLOGY_URIS, source=VariableSource.NONE)
+    AM_CONFIG_RUNTIME_URIS = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_RUNTIME_URIS, source=VariableSource.NONE)
 
 
 
