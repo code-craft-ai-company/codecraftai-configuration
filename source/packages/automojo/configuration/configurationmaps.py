@@ -13,6 +13,7 @@ __credits__ = []
 
 from typing import Dict, Optional, Tuple
 
+import os
 
 from collections import OrderedDict
 
@@ -108,21 +109,25 @@ def resolve_credentials_configuration(this_app: ThisApplication, keyphrase: Opti
  
     credential_uris = []
 
+    config_directory =  this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DIRECTORY)
+
     config_names = ConfigVariables.AM_CONFIG_CREDENTIAL_NAMES
     config_files = ConfigVariables.AM_CONFIG_CREDENTIAL_FILES
+    config_sources = ConfigVariables.AM_CONFIG_CREDENTIAL_SOURCES
 
     # We were told to use credentials but we dont have any config_names or config_files, that means to use the default config.
     if (config_names is None or len(config_names) == 0) and (config_files is None or len(config_files) == 0):
         config_names = ["default-credentials"]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_NAMES, config_names)
 
-    if config_names is not None:
-        source_bases = ConfigVariables.AM_CONFIG_CREDENTIAL_SOURCES
-        if source_bases is None:
-            errmsg = "The 'AM_CONFIG_CREDENTIAL_SOURCES' variable should not be None.  Did you call 'resolve_configuration_variables'."
-            raise SemanticError(errmsg)
+    if config_names is not None and len(config_names) > 0 and (config_sources is None or len(config_sources) == 0):
+        config_sources = [
+            os.path.join(config_directory, "credentials")
+        ]
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES, config_sources)
 
-        config_loader = ConfigurationLoader(source_bases, credentials=credentials)
+    if config_names is not None and len(config_names) > 0:
+        config_loader = ConfigurationLoader(config_sources, credentials=credentials)
 
         for cname in config_names:
             config_uri, config_info = config_loader.load_configuration_by_name(cname, keyphrase=keyphrase)
@@ -150,21 +155,26 @@ def resolve_dataprofiles_configuration(this_app: ThisApplication, keyphrase: Opt
 
     dataprofiles_uris = []
 
+    config_directory =  this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DIRECTORY)
+
     config_names = ConfigVariables.AM_CONFIG_DATAPROFILE_NAMES
     config_files = ConfigVariables.AM_CONFIG_DATAPROFILE_FILES
+    config_sources = ConfigVariables.AM_CONFIG_DATAPROFILE_SOURCES
 
     # We were told to use credentials but we dont have any config_names or config_files, that means to use the default config.
     if (config_names is None or len(config_names) == 0) and (config_files is None or len(config_files) == 0):
         config_names = ["default-dataprofiles"]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_NAMES, config_names)
 
-    if config_names is not None:
-        source_bases = ConfigVariables.AM_CONFIG_DATAPROFILE_SOURCES
-        if source_bases is None:
-            errmsg = "The 'AM_CONFIG_DATAPROFILE_SOURCES' variable should not be None.  Did you call 'resolve_configuration_variables'."
-            raise SemanticError(errmsg)
+    if config_names is not None and len(config_names) > 0 and (dataprofile_sources is None or len(dataprofile_sources) == 0):
+        dataprofile_sources = [
+            os.path.join(config_directory, "dataprofiles")
+        ]
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES, dataprofile_sources)
 
-        config_loader = ConfigurationLoader(source_bases, credentials=credentials)
+    if config_names is not None and len(config_names) > 0:
+
+        config_loader = ConfigurationLoader(config_sources, credentials=credentials)
 
         for cname in config_names:
             config_uri, config_info = config_loader.load_configuration_by_name(cname, keyphrase=keyphrase)
@@ -192,21 +202,26 @@ def resolve_landscape_configuration(this_app: ThisApplication, keyphrase: Option
 
     landscape_uris = []
 
+    config_directory =  this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DIRECTORY)
+
     config_names = ConfigVariables.AM_CONFIG_LANDSCAPE_NAMES
     config_files = ConfigVariables.AM_CONFIG_LANDSCAPE_FILES
+    config_sources = ConfigVariables.AM_CONFIG_LANDSCAPE_SOURCES
 
     # We were told to use credentials but we dont have any config_names or config_files, that means to use the default config.
     if (config_names is None or len(config_names) == 0) and (config_files is None or len(config_files) == 0):
         config_names = ["default-landscape"]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_NAMES, config_names)
 
-    if config_names is not None:
-        source_bases = ConfigVariables.AM_CONFIG_LANDSCAPE_SOURCES
-        if source_bases is None:
-            errmsg = "The 'AM_CONFIG_LANDSCAPE_SOURCES' variable should not be None.  Did you call 'resolve_configuration_variables'."
-            raise SemanticError(errmsg)
+    if config_names is not None and len(config_names) > 0 and (config_sources is None or len(config_sources) == 0):
+        config_sources = [
+            os.path.join(config_directory, "landscapes")
+        ]
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES, config_sources)
 
-        config_loader = ConfigurationLoader(source_bases, credentials=credentials)
+    if config_names is not None and len(config_names) > 0:
+
+        config_loader = ConfigurationLoader(config_sources, credentials=credentials)
 
         for cname in config_names:
             config_uri, config_info = config_loader.load_configuration_by_name(cname, keyphrase=keyphrase)
@@ -234,21 +249,26 @@ def resolve_runtime_configuration(this_app: ThisApplication, keyphrase: Optional
 
     runtime_uris = []
 
+    config_directory =  this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DIRECTORY)
+
     config_names = ConfigVariables.AM_CONFIG_RUNTIME_NAMES
     config_files = ConfigVariables.AM_CONFIG_RUNTIME_FILES
+    config_sources = ConfigVariables.AM_CONFIG_RUNTIME_SOURCES
 
     # We were told to use credentials but we dont have any config_names or config_files, that means to use the default config.
     if (config_names is None or len(config_names) == 0) and (config_files is None or len(config_files) == 0):
         config_names = ["default-runtime"]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_NAMES, config_names)
 
-    if config_names is not None:
-        source_bases = ConfigVariables.AM_CONFIG_RUNTIME_SOURCES
-        if source_bases is None:
-            errmsg = "The 'AM_CONFIG_RUNTIME_SOURCES' variable should not be None.  Did you call 'resolve_configuration_variables'."
-            raise SemanticError(errmsg)
+    if config_names is not None and len(config_names) > 0 and (config_sources is None or len(config_sources) == 0):
+        config_sources = [
+            os.path.join(config_directory, "runtimes")
+        ]
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES, config_sources)
 
-        config_loader = ConfigurationLoader(source_bases, credentials=credentials)
+    if config_names is not None and len(config_names) > 0:
+
+        config_loader = ConfigurationLoader(config_sources, credentials=credentials)
 
         for cname in config_names:
             config_uri, config_info = config_loader.load_configuration_by_name(cname, keyphrase=keyphrase)
@@ -276,21 +296,26 @@ def resolve_topology_configuration(this_app: ThisApplication, keyphrase: Optiona
 
     topology_uris = []
 
+    config_directory =  this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DIRECTORY)
+
     config_names = ConfigVariables.AM_CONFIG_TOPOLOGY_NAMES
     config_files = ConfigVariables.AM_CONFIG_TOPOLOGY_FILES
+    config_sources = ConfigVariables.AM_CONFIG_TOPOLOGY_SOURCES
 
     # We were told to use credentials but we dont have any config_names or config_files, that means to use the default config.
     if (config_names is None or len(config_names) == 0) and (config_files is None or len(config_files) == 0):
         config_names = ["default-topology"]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_NAMES, config_names)
 
-    if config_names is not None:
-        source_bases = ConfigVariables.AM_CONFIG_TOPOLOGY_SOURCES
-        if source_bases is None:
-            errmsg = "The 'AM_CONFIG_TOPOLOGY_SOURCES' variable should not be None.  Did you call 'resolve_configuration_variables'."
-            raise SemanticError(errmsg)
+    if config_names is not None and len(config_names) > 0 and (config_sources is None or len(config_sources) == 0):
+        config_sources = [
+            os.path.join(config_directory, "topologies")
+        ]
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES, config_sources)
 
-        config_loader = ConfigurationLoader(source_bases, credentials=credentials)
+    if config_names is not None and len(config_names) > 0:
+
+        config_loader = ConfigurationLoader(config_sources, credentials=credentials)
 
         for cname in config_names:
             config_uri, config_info = config_loader.load_configuration_by_name(cname, keyphrase=keyphrase)

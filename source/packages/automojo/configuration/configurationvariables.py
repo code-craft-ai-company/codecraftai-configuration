@@ -191,19 +191,11 @@ def resolve_configuration_variables():
 
     credential_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_FILES)
     credential_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_NAMES)
-    credential_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES)
     require_credentials = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_CREDENTIALS)
 
     if (credential_files is not None and len(credential_files) > 0) or (credential_names is not None and len(credential_names) > 0) or \
         require_credentials:
         use_credentials = True
-
-
-    if credential_names is not None and len(credential_names) > 0 and (credential_sources is None or len(credential_sources) == 0):
-        credential_sources = [
-            os.path.join(config_directory, "credentials")
-        ]
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_CREDENTIAL_SOURCES, credential_sources)
         
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_CREDENTIALS, use_credentials)
     
@@ -215,20 +207,12 @@ def resolve_configuration_variables():
 
     dataprofile_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_FILES)
     dataprofile_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_NAMES)
-    dataprofile_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES)
     require_dataprofiles = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_DATAPROFILES)
 
     if (dataprofile_files is not None and len(dataprofile_files) > 0) or (dataprofile_names is not None and len(dataprofile_names) > 0) or \
         require_dataprofiles:
         use_dataprofiles = True
-
-
-    if dataprofile_names is not None and len(dataprofile_names) > 0 and (dataprofile_sources is None or len(dataprofile_sources) == 0):
-        dataprofile_sources = [
-            os.path.join(config_directory, "dataprofiles")
-        ]
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES, dataprofile_sources)
-        
+     
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_DATAPROFILES, use_dataprofiles)
 
 
@@ -239,7 +223,6 @@ def resolve_configuration_variables():
 
     landscape_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_FILES)
     landscape_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_NAMES)
-    landscape_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES)
     require_landscape = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_LANDSCAPE)
 
     if (landscape_files is not None and len(landscape_files)) > 0 or (landscape_names is not None and len(landscape_names) > 0) or \
@@ -263,13 +246,15 @@ def resolve_configuration_variables():
 
     runtime_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_FILES)
     runtime_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_NAMES)
-    runtime_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES)
     require_runtime = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_RUNTIME)
 
     if (runtime_files is not None and len(runtime_files) > 0) or (runtime_names is not None and len(runtime_names) > 0) or \
         require_runtime:
         use_runtimes = True
 
+    if (runtime_files is None or len(runtime_files) == 0) and (runtime_names is None or len(runtime_names) == 0):
+        config_names = ["default-runtime"]
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_NAMES, config_names)
 
     if runtime_names is not None and len(runtime_names) > 0 and (runtime_sources is None or len(runtime_sources) == 0):
         runtime_sources = [
@@ -287,7 +272,6 @@ def resolve_configuration_variables():
 
     topology_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_FILES)
     topology_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_NAMES)
-    topology_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES)
     require_topology = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_TOPOLOGY)
 
     if (topology_files is not None and len(topology_files) > 0) or (topology_names is not None and len(topology_names) > 0) or \
@@ -302,6 +286,5 @@ def resolve_configuration_variables():
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES, topology_sources)
         
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_TOPOLOGY, use_topology)
-
 
     return
