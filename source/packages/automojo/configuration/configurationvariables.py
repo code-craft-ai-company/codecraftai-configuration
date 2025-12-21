@@ -199,7 +199,7 @@ def resolve_configuration_variables():
         use_credentials = True
 
 
-    if len(credential_names) > 0 and len(credential_sources) == 0:
+    if credential_files is not None and len(credential_names) > 0 and len(credential_sources) == 0:
         credential_sources = [
             os.path.join(config_directory, "credentials")
         ]
@@ -227,7 +227,7 @@ def resolve_configuration_variables():
         use_dataprofiles = True
 
 
-    if len(dataprofile_names) > 0 and len(dataprofile_sources) == 0:
+    if dataprofile_files is not None and len(dataprofile_names) > 0 and len(dataprofile_sources) == 0:
         dataprofile_sources = [
             os.path.join(config_directory, "dataprofiles")
         ]
@@ -255,7 +255,7 @@ def resolve_configuration_variables():
         use_landscapes = True
 
 
-    if len(landscape_names) > 0 and len(landscape_sources) == 0:
+    if landscape_files is not None and len(landscape_names) > 0 and len(landscape_sources) == 0:
         landscape_sources = [
             os.path.join(config_directory, "landscapes")
         ]
@@ -283,7 +283,7 @@ def resolve_configuration_variables():
         use_runtimes = True
 
 
-    if len(runtime_names) > 0 and len(runtime_sources) == 0:
+    if runtime_files is not None and len(runtime_names) > 0 and len(runtime_sources) == 0:
         runtime_sources = [
             os.path.join(config_directory, "runtimes")
         ]
@@ -311,7 +311,7 @@ def resolve_configuration_variables():
         use_topology = True
 
 
-    if len(topology_names) > 0 and len(topology_sources) == 0:
+    if topology_files is not None and len(topology_names) > 0 and len(topology_sources) == 0:
         topology_sources = [
             os.path.join(config_directory, "topologies")
         ]
