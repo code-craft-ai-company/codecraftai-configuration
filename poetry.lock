@@ -50,7 +50,7 @@ automojo-extension = {git = "https://github.com/automationmojo/automojo-extensio
 type = "git"
 url = "https://github.com/automationmojo/automojo-this-app.git"
 reference = "main"
-resolved_reference = "99cd67590d912fffe6c26c59b51142fd21a4838f"
+resolved_reference = "9a13d999dc20cfd033adb80309cc90fbd1cf3db7"
 
 [[package]]
 name = "automojo-waiting"
@@ -87,7 +87,7 @@ debugpy = "^1.8.14"
 type = "git"
 url = "https://github.com/automationmojo/automojo-xmodules.git"
 reference = "main"
-resolved_reference = "541e78c59ba70fd689b7156aa87afb0e3f624a6a"
+resolved_reference = "08320c5e699a741c6439207ad66773dd8b465189"
 
 [[package]]
 name = "certifi"
