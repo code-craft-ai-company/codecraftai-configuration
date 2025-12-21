@@ -71,7 +71,7 @@ class ConfigVariablesDesc(PersonaVariablesDesc):
     
 
     AM_CONFIG_DATAPROFILE_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_DATAPROFILE_NAMES, converter=split_and_normalize_name_list)
-    AM_CONFIG_DATAPROFILE_FILES = AppVarDesc(context_path=ContextPaths.CONFIG_DATAPROFILE_FILES, converter=split_and_normalize_path_list)
+    AM_CONFIG_DATAPROFILE_FILES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_DATAPROFILE_FILES, converter=split_and_normalize_path_list)
     AM_CONFIG_DATAPROFILE_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_DATAPROFILE_SOURCES)
     
 
