@@ -53,9 +53,13 @@ DEFAULT_CONFIGURATION = {
     }
 }
 
+def default_config_directory():
+    rtnval = os.path.join(PersonaVariables.AM_PRESENCE_DIR, "config")
+    return rtnval
+
 class ConfigVariablesDesc(PersonaVariablesDesc):
 
-    AM_CONFIG_DIRECTORY = AppVarDesc(default=os.path.join(PersonaVariablesDesc.AM_PRESENCE_DIR.default, "config"))
+    AM_CONFIG_DIRECTORY = AppVarDesc(default=default_config_directory)
     AM_CONFIG_PASS_PHRASE = AppVarDesc()
     AM_CONFIG_STORAGE_URI = AppVarDesc(context_path=ContextPaths.CONFIG_STORAGE_URI, default="")
 
