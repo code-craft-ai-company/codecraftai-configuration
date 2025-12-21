@@ -66,28 +66,28 @@ class ConfigVariablesDesc(PersonaVariablesDesc):
 
     AM_CONFIG_CREDENTIAL_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_CREDENTIAL_NAMES, converter=split_and_normalize_name_list)
     AM_CONFIG_CREDENTIAL_FILES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_CREDENTIAL_FILES, converter=split_and_normalize_path_list)
-    AM_CONFIG_CREDENTIAL_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_CREDENTIAL_SOURCES,
+    AM_CONFIG_CREDENTIAL_SOURCES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_CREDENTIAL_SOURCES,
                                                 converter=split_and_normalize_source_list)
     
 
     AM_CONFIG_DATAPROFILE_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_DATAPROFILE_NAMES, converter=split_and_normalize_name_list)
     AM_CONFIG_DATAPROFILE_FILES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_DATAPROFILE_FILES, converter=split_and_normalize_path_list)
-    AM_CONFIG_DATAPROFILE_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_DATAPROFILE_SOURCES)
+    AM_CONFIG_DATAPROFILE_SOURCES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_DATAPROFILE_SOURCES)
     
 
     AM_CONFIG_LANDSCAPE_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_LANDSCAPE_NAMES, converter=split_and_normalize_name_list)
     AM_CONFIG_LANDSCAPE_FILES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_LANDSCAPE_FILES, converter=split_and_normalize_path_list)
-    AM_CONFIG_LANDSCAPE_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_LANDSCAPE_SOURCES)
+    AM_CONFIG_LANDSCAPE_SOURCES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_LANDSCAPE_SOURCES)
     
 
     AM_CONFIG_TOPOLOGY_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_TOPOLOGY_NAMES, converter=split_and_normalize_name_list)
     AM_CONFIG_TOPOLOGY_FILES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_TOPOLOGY_FILES, converter=split_and_normalize_path_list)
-    AM_CONFIG_TOPOLOGY_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_TOPOLOGY_SOURCES)
+    AM_CONFIG_TOPOLOGY_SOURCES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_TOPOLOGY_SOURCES)
     
 
     AM_CONFIG_RUNTIME_NAMES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_RUNTIME_NAMES, converter=split_and_normalize_name_list)
     AM_CONFIG_RUNTIME_FILES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_RUNTIME_FILES, converter=split_and_normalize_path_list)
-    AM_CONFIG_RUNTIME_SOURCES = AppVarDesc(default="", context_path=ContextPaths.CONFIG_RUNTIME_SOURCES)
+    AM_CONFIG_RUNTIME_SOURCES = AppVarDesc(default=None, context_path=ContextPaths.CONFIG_RUNTIME_SOURCES)
     
 
     AM_CONFIG_REQUIRE_CREDENTIALS = AppVarDesc(default=False, converter=parse_bool)
@@ -199,7 +199,7 @@ def resolve_configuration_variables():
         use_credentials = True
 
 
-    if credential_names is not None and len(credential_names) > 0 and len(credential_sources) == 0:
+    if credential_names is not None and len(credential_names) > 0 and (credential_sources is None or len(credential_sources) == 0):
         credential_sources = [
             os.path.join(config_directory, "credentials")
         ]
@@ -223,7 +223,7 @@ def resolve_configuration_variables():
         use_dataprofiles = True
 
 
-    if dataprofile_names is not None and len(dataprofile_names) > 0 and len(dataprofile_sources) == 0:
+    if dataprofile_names is not None and len(dataprofile_names) > 0 and (dataprofile_sources is None or len(dataprofile_sources) == 0):
         dataprofile_sources = [
             os.path.join(config_directory, "dataprofiles")
         ]
@@ -247,7 +247,7 @@ def resolve_configuration_variables():
         use_landscapes = True
 
 
-    if landscape_names is not None and len(landscape_names) > 0 and len(landscape_sources) == 0:
+    if landscape_names is not None and len(landscape_names) > 0 and (landscape_sources is None or len(landscape_sources) == 0):
         landscape_sources = [
             os.path.join(config_directory, "landscapes")
         ]
@@ -271,7 +271,7 @@ def resolve_configuration_variables():
         use_runtimes = True
 
 
-    if runtime_names is not None and len(runtime_names) > 0 and len(runtime_sources) == 0:
+    if runtime_names is not None and len(runtime_names) > 0 and (runtime_sources is None or len(runtime_sources) == 0):
         runtime_sources = [
             os.path.join(config_directory, "runtimes")
         ]
@@ -295,7 +295,7 @@ def resolve_configuration_variables():
         use_topology = True
 
 
-    if topology_names is not None and len(topology_names) > 0 and len(topology_sources) == 0:
+    if topology_names is not None and len(topology_names) > 0 and (topology_sources is None or len(topology_sources) == 0):
         topology_sources = [
             os.path.join(config_directory, "topologies")
         ]
