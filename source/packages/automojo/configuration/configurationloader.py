@@ -96,10 +96,17 @@ class ConfigurationLoader:
         elif fileext == ".json":
             with open(config_file, 'r') as cf:
                 config_info = json.load(cf)
+        else:
+            errmsg = f"Un-supported configuration file extension '{fileext}' for file '{config_file}'."
+            raise ConfigurationError(errmsg)
 
         if "encrypted_content" in config_info:
             if "format" in config_info:
                 config_format = config_info["format"]
+
+            if key is None:
+                errmsg = "Encrypted configuration content found but no key or keyphrase was provided."
+                raise ConfigurationError(errmsg)
 
             decryptor = Fernet(key)
             
@@ -162,6 +169,10 @@ class ConfigurationLoader:
 
             if "format" in config_info:
                 config_format = config_info["format"]
+
+            if key is None:
+                errmsg = "Encrypted configuration content found but no key or keyphrase was provided."
+                raise ConfigurationError(errmsg)
 
             encrypted_content = config_info["encrypted_content"]
 
