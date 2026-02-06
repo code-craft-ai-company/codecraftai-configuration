@@ -20,7 +20,8 @@ mime_source_prefixes = [
     "http://",
     "https://",
     "dir://",
-    "mongodb://"
+    "mongodb://",
+    "couchdb://"
 ]
 
 def starts_with_mime_prefix(uri: str):
