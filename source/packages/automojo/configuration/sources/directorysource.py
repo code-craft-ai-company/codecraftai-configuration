@@ -85,7 +85,4 @@ class DirectorySource(ConfigurationSourceBase):
                         config_info = json.load(cf)
                 break
 
-        if config_info is not None:
-            config_format = None
-
         return config_format, config_info
