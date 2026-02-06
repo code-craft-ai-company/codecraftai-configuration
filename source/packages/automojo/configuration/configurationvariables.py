@@ -223,9 +223,11 @@ def resolve_configuration_variables():
 
     landscape_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_FILES)
     landscape_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_NAMES)
+    landscape_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES)
     require_landscape = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_LANDSCAPE)
 
-    if (landscape_files is not None and len(landscape_files)) > 0 or (landscape_names is not None and len(landscape_names) > 0) or \
+    if (landscape_files is not None and len(landscape_files) > 0) or (landscape_names is not None and len(landscape_names) > 0) or \
+       (landscape_sources is not None and len(landscape_sources) > 0) or \
         require_landscape:
         use_landscapes = True
 
@@ -246,9 +248,11 @@ def resolve_configuration_variables():
 
     runtime_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_FILES)
     runtime_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_NAMES)
+    runtime_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES)
     require_runtime = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_RUNTIME)
 
     if (runtime_files is not None and len(runtime_files) > 0) or (runtime_names is not None and len(runtime_names) > 0) or \
+       (runtime_sources is not None and len(runtime_sources) > 0) or \
         require_runtime:
         use_runtimes = True
 
@@ -272,9 +276,11 @@ def resolve_configuration_variables():
 
     topology_files = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_FILES)
     topology_names = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_NAMES)
+    topology_sources = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES)
     require_topology = this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_REQUIRE_TOPOLOGY)
 
     if (topology_files is not None and len(topology_files) > 0) or (topology_names is not None and len(topology_names) > 0) or \
+       (topology_sources is not None and len(topology_sources) > 0) or \
         require_topology:
         use_topology = True
 
