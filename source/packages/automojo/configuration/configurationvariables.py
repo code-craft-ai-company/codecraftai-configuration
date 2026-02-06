@@ -228,13 +228,6 @@ def resolve_configuration_variables():
     if (landscape_files is not None and len(landscape_files)) > 0 or (landscape_names is not None and len(landscape_names) > 0) or \
         require_landscape:
         use_landscapes = True
-
-
-    if landscape_names is not None and len(landscape_names) > 0 and (landscape_sources is None or len(landscape_sources) == 0):
-        landscape_sources = [
-            os.path.join(config_directory, "landscapes")
-        ]
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_LANDSCAPE_SOURCES, landscape_sources)
         
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_LANDSCAPE, use_landscapes)
 
@@ -251,16 +244,6 @@ def resolve_configuration_variables():
     if (runtime_files is not None and len(runtime_files) > 0) or (runtime_names is not None and len(runtime_names) > 0) or \
         require_runtime:
         use_runtimes = True
-
-    if (runtime_files is None or len(runtime_files) == 0) and (runtime_names is None or len(runtime_names) == 0):
-        config_names = ["default-runtime"]
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_NAMES, config_names)
-
-    if runtime_names is not None and len(runtime_names) > 0 and (runtime_sources is None or len(runtime_sources) == 0):
-        runtime_sources = [
-            os.path.join(config_directory, "runtimes")
-        ]
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_RUNTIME_SOURCES, runtime_sources)
         
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_RUNTIME, use_runtimes)
 
@@ -278,13 +261,6 @@ def resolve_configuration_variables():
         require_topology:
         use_topology = True
 
-
-    if topology_names is not None and len(topology_names) > 0 and (topology_sources is None or len(topology_sources) == 0):
-        topology_sources = [
-            os.path.join(config_directory, "topologies")
-        ]
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_TOPOLOGY_SOURCES, topology_sources)
-        
     this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_USE_TOPOLOGY, use_topology)
 
     return
