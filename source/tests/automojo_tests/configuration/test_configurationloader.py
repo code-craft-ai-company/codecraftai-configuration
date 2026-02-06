@@ -23,7 +23,7 @@ from automojo.configuration.cryptography import (
     create_encrypted_configuration,
     generate_fernet_key,
 )
-from automojo.errors.exceptions import SemanticError
+from automojo.errors.exceptions import SemanticError, ConfigurationError
 
 
 class TestConfigurationLoader(unittest.TestCase):
@@ -126,6 +126,41 @@ class TestConfigurationLoader(unittest.TestCase):
                 key="abc",
                 keyphrase="def"
             )
+        return
+
+    def test_load_encrypted_configuration_missing_format(self):
+        # Create an encrypted config without "format" field
+        encrypted_payload = {'secret': 'value'}
+        plain_json = json.dumps(encrypted_payload)
+        keyphrase = "encryption-passphrase"
+        key = generate_fernet_key(keyphrase)
+
+        # Manually create encrypted doc without format
+        encrypted_content = create_encrypted_configuration(
+            key,
+            plain_json,
+            format=ConfigurationFormat.JSON
+        )["encrypted_content"]
+
+        encrypted_doc = {
+            "encrypted_content": encrypted_content
+            # Missing "format"
+        }
+
+        encrypted_path = os.path.join(self.configDirectory, 'encrypted_no_format.json')
+        with open(encrypted_path, 'w') as f:
+            json.dump(encrypted_doc, f)
+
+        loader = ConfigurationLoader([])
+
+        # It should raise ConfigurationError because format is unknown
+        with self.assertRaises(ConfigurationError) as cm:
+            loader.load_configuration_from_file(
+                encrypted_path,
+                keyphrase=keyphrase
+            )
+
+        self.assertIn("UnExpected error parsing decrypted configuration content.  Un-supported format.", str(cm.exception))
         return
 
 if __name__ == '__main__':
