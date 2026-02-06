@@ -87,6 +87,7 @@ class ConfigurationLoader:
             key = generate_fernet_key(keyphrase)
 
         config_info = None
+        config_format = None
 
         _, fileext = os.path.splitext(config_file)
 

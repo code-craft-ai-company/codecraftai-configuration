@@ -166,11 +166,11 @@ def resolve_dataprofiles_configuration(this_app: ThisApplication, keyphrase: Opt
         config_names = ["default-dataprofiles"]
         this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_NAMES, config_names)
 
-    if config_names is not None and len(config_names) > 0 and (dataprofile_sources is None or len(dataprofile_sources) == 0):
-        dataprofile_sources = [
+    if config_names is not None and len(config_names) > 0 and (config_sources is None or len(config_sources) == 0):
+        config_sources = [
             os.path.join(config_directory, "dataprofiles")
         ]
-        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES, dataprofile_sources)
+        this_app.override_variable_value(ConfigVariablesDesc.AM_CONFIG_DATAPROFILE_SOURCES, config_sources)
 
     if config_names is not None and len(config_names) > 0:
 
