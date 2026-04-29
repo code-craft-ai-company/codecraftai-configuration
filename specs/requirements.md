@@ -1,364 +1,279 @@
 # AutoMojo Configuration Package Requirements
 
-## 1. Functional Requirements
-
-### 1.1 Configuration Loading
-
-**REQ-1.1.1: Multi-Source Configuration Loading**
-- The system SHALL support loading configurations from multiple source types in priority order
-- The system SHALL support the following source types:
-  - Local directory sources (`dir://path`)
-  - HTTP/HTTPS sources (`http://` or `https://`)
-  - CouchDB sources (`couchdb://`)
-  - MongoDB sources (`mongodb://`)
-- The system SHALL search sources in the order specified until a configuration is found
-- The system SHALL return the first matching configuration found across all sources
-
-**REQ-1.1.2: Configuration Format Support**
-- The system SHALL support YAML configuration files (`.yaml`, `.yml` extensions)
-- The system SHALL support JSON configuration files (`.json` extension)
-- The system SHALL automatically detect configuration format based on file extension
-- The system SHALL handle empty configuration files gracefully by returning empty dictionaries
-
-**REQ-1.1.3: Configuration Loading Methods**
-- The system SHALL provide a method to load configurations by name from configured sources
-- The system SHALL provide a method to load configurations directly from file paths
-- The system SHALL return configuration URI and data when loading by name
-- The system SHALL return configuration data when loading from file
-
-### 1.2 Configuration Types
-
-**REQ-1.2.1: Configuration Categories**
-- The system SHALL support five distinct configuration categories:
-  - Credentials - Authentication and access credentials
-  - Landscapes - Environment and infrastructure definitions  
-  - Topologies - System topology and connectivity information
-  - Runtimes - Runtime execution parameters
-  - Data Profiles - Test data and data source configurations
-
-**REQ-1.2.2: Configuration Maps**
-- The system SHALL maintain separate configuration maps for each configuration type
-- The system SHALL support merging multiple configurations of the same type
-- The system SHALL provide default configurations for runtime settings
-- The system SHALL insert configuration maps into application context (except credentials)
-
-### 1.3 Encryption Support
-
-**REQ-1.3.1: Configuration Encryption**
-- The system SHALL support encrypting configuration content using Fernet symmetric encryption
-- The system SHALL support key generation from user-provided passphrases
-- The system SHALL support direct key provision for encryption operations
-- The system SHALL NOT allow both key and keyphrase to be provided simultaneously
-
-**REQ-1.3.2: Encrypted Configuration Format**
-- The system SHALL store encrypted configurations with metadata including format and version
-- The system SHALL automatically decrypt configurations during loading when key/keyphrase provided
-- The system SHALL preserve original configuration format after decryption
-- The system SHALL support both JSON and YAML formats for encrypted content
-
-### 1.4 Configuration Synchronization
-
-**REQ-1.4.1: Bidirectional Synchronization**
-- The system SHALL support publishing local configurations to remote stores
-- The system SHALL support retrieving configurations from remote stores to local filesystem
-- The system SHALL support synchronization for all configuration types (credentials, landscapes, topologies, runtimes)
-- The system SHALL organize synchronized configurations by venue, user, and configuration class
-
-**REQ-1.4.2: Synchronization Backends**
-- The system SHALL support directory-based synchronization
-- The system SHALL support CouchDB synchronization
-- The system SHALL support MongoDB synchronization  
-- The system SHALL support GitHub repository synchronization
-- The system SHALL handle synchronization errors gracefully and return error lists
-
-### 1.5 Environment Variable Management
-
-**REQ-1.5.1: Variable Resolution**
-- The system SHALL automatically resolve environment variables for configuration paths and settings
-- The system SHALL support variable descriptors with default values, converters, and context paths
-- The system SHALL provide variable accessors for runtime access to configuration values
-- The system SHALL support variable overrides at runtime
-
-**REQ-1.5.2: Configuration Requirements**
-- The system SHALL support marking configuration types as required or optional
-- The system SHALL automatically enable configuration usage when names or files are specified
-- The system SHALL provide default source paths when names are specified without sources
-- The system SHALL validate required configurations are available
-
-### 1.6 Configuration Overrides
-
-**REQ-1.6.1: Runtime Overrides**
-- The system SHALL provide static methods to override configuration names for all types
-- The system SHALL provide static methods to override configuration sources for all types  
-- The system SHALL provide static methods to override configuration files for all types
-- The system SHALL automatically mark configurations as required when overrides are applied
-
-**REQ-1.6.2: Requirement Overrides**
-- The system SHALL provide method to override configuration requirements for all types
-- The system SHALL support enabling/disabling requirement flags at runtime
-- The system SHALL integrate overrides with application variable system
-
-## 2. Non-Functional Requirements
-
-### 2.1 Security
-
-**REQ-2.1.1: Credential Protection**
-- The system SHALL NOT store credential configurations in application context by default
-- The system SHALL support secure encryption of sensitive configuration data
-- The system SHALL use cryptographically secure key derivation for passphrases
-- The system SHALL support certificate validation for HTTPS connections (enabled by default)
-
-**REQ-2.1.2: Access Control**
-- The system SHALL support credential mapping for authenticated sources
-- The system SHALL support host-based credential resolution
-- The system SHALL isolate configurations by namespace (venue/user) in synchronized stores
-- The system SHALL validate URI formats during source initialization
-
-### 2.2 Performance
-
-**REQ-2.2.1: Efficient Operations**
-- The system SHALL cache source instances within loader lifecycle
-- The system SHALL use merge semantics for efficient configuration layering
-- The system SHALL support lazy loading of configuration data
-- The system SHALL minimize memory footprint for unused configuration types
-
-**REQ-2.2.2: Network Optimization**
-- The system SHALL support connection reuse for HTTP sources
-- The system SHALL maintain persistent connections for database sources
-- The system SHALL provide configurable timeouts and retry logic
-- The system SHALL handle network failures gracefully
-
-### 2.3 Reliability
-
-**REQ-2.3.1: Error Handling**
-- The system SHALL return None for missing configurations rather than raising exceptions
-- The system SHALL isolate source failures to prevent affecting other sources
-- The system SHALL provide comprehensive error reporting with source context
-- The system SHALL validate configuration formats during loading
-
-**REQ-2.3.2: Graceful Degradation**
-- The system SHALL continue operation when individual sources are unavailable
-- The system SHALL handle missing optional dependencies gracefully
-- The system SHALL provide meaningful error messages for configuration issues
-- The system SHALL support debugging through verbose logging
-
-### 2.4 Maintainability
-
-**REQ-2.4.1: Extensibility**
-- The system SHALL support adding new configuration sources through abstract base classes
-- The system SHALL support adding new synchronization backends through base classes
-- The system SHALL support extending configuration formats through enumeration
-- The system SHALL use factory patterns for source instantiation
-
-**REQ-2.4.2: Code Quality**
-- The system SHALL follow established Python coding standards and conventions
-- The system SHALL prioritize debuggability over performance as specified in coding standards
-- The system SHALL prioritize readability over conciseness as specified in coding standards
-- The system SHALL provide comprehensive documentation for all public interfaces
-
-## 3. Interface Requirements
-
-### 3.1 Configuration Loader Interface
-
-**REQ-3.1.1: Constructor Interface**
-- The ConfigurationLoader constructor SHALL accept a list of source URIs
-- The ConfigurationLoader constructor SHALL accept optional credentials mapping
-- The ConfigurationLoader constructor SHALL accept optional certificate verification flag
-- The ConfigurationLoader constructor SHALL validate and initialize all sources
-
-**REQ-3.1.2: Loading Interface**
-- The load_configuration_by_name method SHALL accept configuration name, optional key, and optional keyphrase
-- The load_configuration_from_file method SHALL accept file path, optional key, and optional keyphrase
-- Both methods SHALL return appropriate data structures (URI+data or data only)
-- Both methods SHALL handle encryption/decryption transparently
-
-### 3.2 Configuration Source Interface
-
-**REQ-3.2.1: Abstract Base Interface**
-- All configuration sources SHALL implement ConfigurationSourceBase abstract class
-- All sources SHALL implement try_load_configuration method
-- All sources SHALL implement parse class method for URI parsing
-- All sources SHALL return (format, data) tuples or (None, None) for not found
-
-**REQ-3.2.2: Source-Specific Interfaces**
-- Directory sources SHALL support local filesystem path resolution
-- HTTP sources SHALL support GET requests with optional authentication
-- Database sources SHALL support connection strings and credential authentication
-- All sources SHALL handle their specific error conditions gracefully
-
-### 3.3 Synchronization Interface
-
-**REQ-3.3.1: Base Synchronizer Interface**
-- All synchronizers SHALL implement ConfigSynchronizerBase abstract class
-- All synchronizers SHALL implement _publish_configuration method
-- All synchronizers SHALL implement _retrieve_configuration method
-- All synchronizers SHALL support venue/user/class organization
-
-**REQ-3.3.2: Synchronization Operations**
-- The try_publish method SHALL attempt to publish all configuration types
-- The try_retrieve method SHALL attempt to retrieve all configuration types
-- Both methods SHALL return lists of error messages for failed operations
-- Both methods SHALL continue processing after individual failures
-
-## 4. Data Requirements
-
-### 4.1 Configuration Data Structure
-
-**REQ-4.1.1: Configuration Format**
-- Configuration data SHALL be represented as nested dictionaries
-- Configuration files SHALL support hierarchical key-value structures
-- Configuration merging SHALL preserve nested structure integrity
-- Configuration validation SHALL ensure proper data types
-
-**REQ-4.1.2: Metadata Requirements**
-- Encrypted configurations SHALL include version and format metadata
-- Configuration URIs SHALL be tracked for audit and debugging purposes
-- Configuration sources SHALL maintain URI and connection information
-- Configuration maps SHALL support insertion order preservation
-
-### 4.2 Environment Variable Data
-
-**REQ-4.2.1: Variable Descriptors**
-- Variable descriptors SHALL include default values, converters, and context paths
-- Variable descriptors SHALL support multiple variable sources (environment, context, etc.)
-- Variable descriptors SHALL provide type conversion capabilities
-- Variable descriptors SHALL support validation rules
-
-**REQ-4.2.2: Variable Normalization**
-- Path variables SHALL support expansion of user home directories and environment variables
-- URI variables SHALL support multiple schemes and validation
-- List variables SHALL support delimiter-based parsing and normalization
-- Boolean variables SHALL support string-to-boolean conversion
-
-## 5. Integration Requirements
-
-### 5.1 Application Integration
-
-**REQ-5.1.1: Application Context Integration**
-- The system SHALL integrate with ThisApplication singleton pattern
-- The system SHALL insert configuration maps into application context
-- The system SHALL support variable override mechanisms through application context
-- The system SHALL establish application persona during configuration setup
-
-**REQ-5.1.2: Dependency Integration**
-- The system SHALL integrate with automojo.errors for exception handling
-- The system SHALL integrate with automojo.xmodules for utility functions
-- The system SHALL support optional dependencies for database sources
-- The system SHALL provide clear error messages for missing dependencies
-
-### 5.2 External System Integration
-
-**REQ-5.2.1: Database Integration**
-- The system SHALL support CouchDB integration through couchdb library
-- The system SHALL support MongoDB integration through pymongo library
-- The system SHALL handle database connection lifecycle properly
-- The system SHALL support authentication for database connections
-
-**REQ-5.2.2: Network Integration**
-- The system SHALL support HTTP/HTTPS integration through requests library
-- The system SHALL support GitHub API integration for repository synchronization
-- The system SHALL handle network timeouts and retries appropriately
-- The system SHALL support certificate validation for secure connections
-
-## 6. Compliance Requirements
-
-### 6.1 Testing Framework Compliance
-
-**REQ-6.1.1: Testing Integration**
-- The system SHALL be designed for use with testing tools and frameworks
-- The system SHALL prioritize debuggability to support test troubleshooting
-- The system SHALL provide clear error messages for test configuration issues
-- The system SHALL support test environment isolation through configuration namespacing
-
-### 6.1.2: Automation Framework Compliance**
-- The system SHALL support automation testing scenarios through flexible configuration
-- The system SHALL provide runtime configuration override capabilities for test execution
-- The system SHALL support multiple environment configurations for test landscapes
-- The system SHALL enable credential management for automated test execution
-
-### 6.2 Security Compliance
-
-**REQ-6.2.1: Data Protection**
-- The system SHALL protect sensitive configuration data through encryption
-- The system SHALL avoid logging or exposing credential information
-- The system SHALL support secure key management practices
-- The system SHALL validate input data to prevent injection attacks
-
-**REQ-6.2.2: Access Control Compliance**
-- The system SHALL support role-based access through credential mapping
-- The system SHALL provide audit trails through URI tracking
-- The system SHALL support secure communication protocols (HTTPS, TLS)
-- The system SHALL validate certificates for secure connections by default
-
-## 7. Constraints and Assumptions
-
-### 7.1 Technical Constraints
-
-**CONSTRAINT-7.1.1: Python Version Compatibility**
-- The system SHALL be compatible with Python 3.x versions
-- The system SHALL use type hints for improved code maintainability
-- The system SHALL follow Python packaging standards
-
-**CONSTRAINT-7.1.2: Dependency Constraints**
-- Core functionality SHALL NOT require optional database dependencies
-- Database sources SHALL gracefully handle missing optional dependencies
-- The system SHALL minimize external dependency requirements
-
-### 7.2 Operational Assumptions
-
-**ASSUMPTION-7.2.1: Environment Assumptions**
-- The system assumes proper environment variable configuration for paths
-- The system assumes network connectivity for remote sources
-- The system assumes proper file system permissions for local operations
-
-**ASSUMPTION-7.2.2: Usage Assumptions**
-- The system assumes users will follow established naming conventions
-- The system assumes proper credential management by users
-- The system assumes configuration files follow supported formats (JSON/YAML)
-
-## 8. Acceptance Criteria
-
-### 8.1 Functional Acceptance
-
-**AC-8.1.1: Configuration Loading**
-- GIVEN multiple configuration sources are configured
-- WHEN a configuration is requested by name
-- THEN the system returns the first matching configuration found
-- AND the configuration data is properly formatted
-- AND the source URI is tracked for audit purposes
-
-**AC-8.1.2: Encryption Support**
-- GIVEN an encrypted configuration file with a keyphrase
-- WHEN the configuration is loaded with the correct keyphrase
-- THEN the system decrypts and returns the configuration data
-- AND the original format is preserved after decryption
-
-**AC-8.1.3: Multi-Type Configuration**
-- GIVEN configuration requirements are specified for multiple types
-- WHEN configuration resolution is performed
-- THEN all required configuration types are loaded successfully
-- AND configuration maps are properly populated
-- AND appropriate configurations are inserted into application context
-
-### 8.2 Non-Functional Acceptance
-
-**AC-8.2.1: Error Handling**
-- GIVEN a configuration source is unavailable
-- WHEN configuration loading is attempted
-- THEN the system continues with remaining sources
-- AND appropriate error information is provided
-- AND the system does not crash or become unstable
-
-**AC-8.2.2: Security**
-- GIVEN sensitive configuration data
-- WHEN the data is encrypted and stored
-- THEN unauthorized access cannot retrieve the plain text data
-- AND proper key management practices are followed
-- AND credential information is not exposed in logs or context
-
-**AC-8.2.3: Performance**
-- GIVEN multiple configuration sources and types
-- WHEN configurations are loaded repeatedly
-- THEN the system performs efficiently through caching
-- AND memory usage remains reasonable
-- AND network connections are optimized
+## Introduction
+
+The AutoMojo Configuration package provides a multi-source, multi-format configuration loading system with encryption support, environment variable management, configuration map merging, and bidirectional synchronization to remote stores. It supports five configuration categories (credentials, landscapes, topologies, runtimes, data profiles) loaded from directory, HTTP, CouchDB, and MongoDB sources. This document provides implementation-level detail sufficient for porting the functionality to another language.
+
+## Source Module Map
+
+| Source Module | Purpose |
+|---|---|
+| `configurationformat.py` | `ConfigurationFormat` enum (JSON, YAML) |
+| `configurationloader.py` | `ConfigurationLoader` — multi-source config loading with encryption |
+| `configurationmaps.py` | Per-type config resolution functions, `CONFIGURATION_MAPS` singleton |
+| `configurationsettings.py` | `ConfigurationDefaults`, `establish_configuration_settings()` |
+| `configurationvariables.py` | `ConfigVariablesDesc`, `ConfigVariables`, `resolve_configuration_variables()` |
+| `cryptography.py` | Fernet encryption/decryption, key generation from keyphrase |
+| `defaultvalues.py` | `DefaultValues.NotSet` sentinel |
+| `normalize.py` | Input normalization helpers (name lists, path lists, source lists) |
+| `optionoverrides.py` | `ConfigOptionOverrides` — per-type override static methods |
+| `sources/configurationsourcebase.py` | `ConfigurationSourceBase` abstract base |
+| `sources/directorysource.py` | `DirectorySource` — filesystem config loading |
+| `sources/httpsource.py` | `HttpSource` — HTTP/HTTPS config loading |
+| `sources/couchdbsource.py` | `CouchDBSource` — CouchDB config loading |
+| `sources/mongodbsource.py` | `MongoDBSource` — MongoDB config loading |
+| `synchronization/configsynchronizerbase.py` | `ConfigSynchronizerBase` abstract base |
+| `synchronization/directoryconfigsynchronizer.py` | Directory-based sync |
+| `synchronization/couchdbconfigsynchronizer.py` | CouchDB-based sync |
+| `synchronization/mongodbconfigsynchronizer.py` | MongoDB-based sync |
+| `synchronization/githubconfigsynchronizer.py` | GitHub repository sync |
+
+---
+
+## Requirements
+
+### Requirement 1: Configuration Format Enumeration
+
+**User Story:** As a framework developer, I want a typed enumeration of supported configuration formats, so that format handling is consistent.
+
+#### Acceptance Criteria
+
+1. THE `ConfigurationFormat` enum SHALL define two values: `JSON = "json"` and `YAML = "yaml"`.
+2. THE enum SHALL be a string enum for serialization compatibility.
+3. THE enum SHALL be used throughout the system to identify configuration file formats.
+
+---
+
+### Requirement 2: Configuration Loader
+
+**User Story:** As a developer, I want to load configurations from multiple sources by name or file path, with automatic encryption handling, so that configurations are resolved from the first available source.
+
+#### Acceptance Criteria
+
+1. THE `ConfigurationLoader` SHALL accept a list of source URI strings, optional credentials mapping (`dict[string, (string, string)]` — host to user/password), and optional `verify_certificate` flag (default: `true`).
+2. WHEN initialized, THE loader SHALL parse each URI and create the appropriate source instance:
+   - URIs starting with `couchdb://` → `CouchDBSource`
+   - URIs starting with `mongodb://` → `MongoDBSource`
+   - URIs starting with `http://` or `https://` → `HttpSource`
+   - All other URIs → `DirectorySource`
+3. IF a source URI fails to parse, THE loader SHALL raise a `ConfigurationError` with the URI in the message.
+4. WHEN `load_configuration_by_name(config_name, key?, keyphrase?)` is called, THE loader SHALL iterate through sources calling `try_load_configuration(config_name, credentials)` on each, returning the first non-None result as `(config_uri, config_data)`.
+5. IF no source returns a configuration, THE loader SHALL raise a `ConfigurationError` listing all checked source URIs.
+6. WHEN `load_configuration_from_file(config_file, key?, keyphrase?)` is called, THE loader SHALL load directly from the file path, detecting format by extension (`.yaml`/`.yml` → YAML, `.json` → JSON).
+7. IF an unsupported file extension is encountered, THE loader SHALL raise a `ConfigurationError`.
+8. IF both `key` and `keyphrase` are provided, THE loader SHALL raise a `SemanticError` — only one is allowed.
+9. WHEN the loaded configuration contains an `"encrypted_content"` key, THE loader SHALL decrypt it using the provided key (or key derived from keyphrase), parse the decrypted content according to the `"format"` field, and return the decrypted data.
+10. IF encrypted content is found but no key or keyphrase is provided, THE loader SHALL raise a `ConfigurationError`.
+
+---
+
+### Requirement 3: Configuration Source Base
+
+**User Story:** As a framework developer, I want an abstract base for configuration sources, so that new source types can be added.
+
+#### Acceptance Criteria
+
+1. THE `ConfigurationSourceBase` SHALL define a `scheme` class attribute identifying the URI scheme.
+2. THE base SHALL store the source `uri` and expose it as a property.
+3. THE base SHALL define an abstract `parse(uri) -> Option[ConfigurationSourceBase]` class method.
+4. THE base SHALL define an abstract `try_load_configuration(config_name, credentials?) -> (ConfigurationFormat?, dict?)` method returning `(format, data)` on success or `(None, None)` on not-found.
+
+---
+
+### Requirement 4: Directory Source
+
+**User Story:** As a developer, I want to load configurations from local filesystem directories, so that configurations can be stored as files.
+
+#### Acceptance Criteria
+
+1. THE `DirectorySource` SHALL have scheme `"dir"` and parse URIs matching `dir://(?P<directory>.+)`.
+2. IF the URI does not match the `dir://` pattern, THE source SHALL treat the entire URI as a directory path.
+3. THE directory path SHALL be expanded using environment variable and home directory expansion.
+4. WHEN `try_load_configuration` is called, THE source SHALL search for `{config_name}.yaml`, `{config_name}.yml`, `{config_name}.json` in the directory (in that order), returning the first found.
+5. IF the file is empty, THE source SHALL return an empty dictionary (not None).
+
+---
+
+### Requirement 5: HTTP Source
+
+**User Story:** As a developer, I want to load configurations from HTTP/HTTPS endpoints, so that configurations can be served remotely.
+
+#### Acceptance Criteria
+
+1. THE `HttpSource` SHALL support both `http://` and `https://` schemes.
+2. WHEN `try_load_configuration` is called, THE source SHALL try GET requests for `{base_url}/{config_name}.yaml`, `.yml`, `.json` (in that order), returning the first successful response (HTTP 200).
+3. THE source SHALL parse the response content according to the detected format.
+
+---
+
+### Requirement 6: CouchDB Source
+
+**User Story:** As a developer, I want to load configurations from CouchDB databases, so that configurations can be stored in a document database.
+
+#### Acceptance Criteria
+
+1. THE `CouchDBSource` SHALL parse URIs matching the `couchdb://` scheme.
+2. THE source SHALL connect to the CouchDB instance and look up the configuration document by name.
+3. IF the `couchdb` library is not installed, THE source SHALL raise an `ImportError` with a clear message.
+
+---
+
+### Requirement 7: MongoDB Source
+
+**User Story:** As a developer, I want to load configurations from MongoDB databases, so that configurations can be stored in a document database.
+
+#### Acceptance Criteria
+
+1. THE `MongoDBSource` SHALL parse URIs matching the `mongodb://` scheme.
+2. THE source SHALL support optional certificate verification via the `verify_certificate` parameter.
+3. IF the `pymongo` library is not installed, THE source SHALL raise an `ImportError` with a clear message.
+
+---
+
+### Requirement 8: Cryptography
+
+**User Story:** As a developer, I want to encrypt and decrypt configuration content using Fernet symmetric encryption, so that sensitive configurations are protected.
+
+#### Acceptance Criteria
+
+1. THE `generate_fernet_key(keyphrase)` function SHALL generate a deterministic Fernet key from a keyphrase using `random.Random(keyphrase).randbytes(32)` encoded as URL-safe base64.
+2. THE `encrypt_content(key, plain_content)` function SHALL encrypt a UTF-8 string using Fernet, returning a base64-encoded ciphertext string.
+3. THE `decrypt_content(key, encrypted_content)` function SHALL decode the base64 ciphertext, decrypt with Fernet, and return the UTF-8 plaintext string.
+4. THE `create_encrypted_configuration(key, plain_configuration, format?)` function SHALL return a dictionary with `"version": "1.0"`, `"format"`, and `"encrypted_content"` fields.
+
+---
+
+### Requirement 9: Configuration Variables
+
+**User Story:** As a framework developer, I want a typed variable descriptor and accessor system for configuration settings, so that variables are resolved from environment, context, and defaults with proper type conversion.
+
+#### Acceptance Criteria
+
+1. THE `ConfigVariablesDesc` class SHALL extend `PersonaVariablesDesc` and define descriptors for all configuration variables using `AppVarDesc`.
+2. FOR each configuration type (credentials, dataprofiles, landscape, topology, runtime), THE descriptors SHALL include: `_NAMES` (converter: `split_and_normalize_name_list`), `_FILES` (converter: `split_and_normalize_path_list`), `_SOURCES` (converter: `split_and_normalize_source_list`), `_URIS` (source: NONE), `REQUIRE_` (converter: `parse_bool`, default: False), `USE_` (source: NONE, default: False).
+3. THE `ConfigVariables` class SHALL extend `PersonaVariables` and define accessors for all descriptors using `AppVarAccessor`.
+4. THE `resolve_configuration_variables()` function SHALL resolve all descriptors via `ThisApplicationSingleton().resolve_variable_set(ConfigVariablesDesc)`, insert configuration maps into the application context (excluding credentials), and compute `USE_` flags based on whether names, files, or require flags are set for each type.
+5. THE function SHALL be idempotent — guarded by `CONFIGURATION_VARIABLES_RESOLVED` flag.
+
+---
+
+### Requirement 10: Configuration Maps Resolution
+
+**User Story:** As a framework developer, I want per-type configuration resolution that loads configs from sources and merges them into configuration maps, so that the application has a unified view of each configuration type.
+
+#### Acceptance Criteria
+
+1. THE `CONFIGURATION_MAPS` class SHALL maintain five `MergeMap` instances: `CREDENTIAL_CONFIGURATION_MAP`, `DATAPROFILE_CONFIGURATION_MAP`, `LANDSCAPE_CONFIGURATION_MAP`, `RUNTIME_CONFIGURATION_MAP` (initialized with `ConfigurationDefaults.DEFAULT_CONFIGURATION`), `TOPOLOGY_CONFIGURATION_MAP`.
+2. THE `resolve_configuration_maps()` function SHALL accept optional `use_*` flags, `keyphrase`, and `credentials`, resolving each enabled type by calling its per-type resolution function.
+3. FOR each configuration type, THE resolution function SHALL:
+   a. Default to `"default-{type}"` config name if no names or files are specified.
+   b. Default to `{config_directory}/{type_plural}` source path if names are specified but no sources.
+   c. Create a `ConfigurationLoader` with the sources and load each named config, inserting into the type's `MergeMap` at position 0 (highest priority).
+   d. Load each file config and insert into the `MergeMap`.
+   e. Store the resolved URIs in the corresponding `_URIS` variable.
+
+---
+
+### Requirement 11: Input Normalization
+
+**User Story:** As a framework developer, I want helper functions to normalize semicolon-separated input strings into typed lists, so that environment variable values are properly parsed.
+
+#### Acceptance Criteria
+
+1. THE `split_and_normalize_name_list(names_val, sep=";")` function SHALL split on the separator and strip whitespace from each name.
+2. THE `split_and_normalize_path_list(paths_val, sep=";")` function SHALL split on the separator, strip `file://` prefixes, and expand each path using `os.path.abspath(os.path.expandvars(os.path.expanduser(...)))`.
+3. THE `split_and_normalize_source_list(sources_val, sep=";")` function SHALL split on the separator and expand non-URI paths (those not starting with `http://`, `https://`, `dir://`, `mongodb://`, `couchdb://`) using the same path expansion.
+4. THE default separator SHALL be `";"`.
+
+---
+
+### Requirement 12: Configuration Option Overrides
+
+**User Story:** As a framework developer, I want static methods to override configuration names, sources, files, and requirements at runtime, so that CLI arguments and programmatic setup can control configuration loading.
+
+#### Acceptance Criteria
+
+1. THE `ConfigOptionOverrides` class SHALL provide static methods for each configuration type: `override_config_{type}_names`, `override_config_{type}_sources`, `override_config_{type}_files`.
+2. WHEN overriding names or files, THE method SHALL also set the corresponding `REQUIRE_` flag to `True`.
+3. WHEN overriding sources, THE method SHALL NOT set the require flag (sources alone don't imply requirement).
+4. THE `override_configuration_requirements()` method SHALL accept boolean flags for each type and set the corresponding `REQUIRE_` variables.
+5. ALL override methods SHALL use `ThisApplicationSingleton().override_variable_value()`.
+
+---
+
+### Requirement 13: Configuration Settings Establishment
+
+**User Story:** As a framework developer, I want a one-time initialization function that establishes the application persona and default configuration, so that the configuration system is bootstrapped.
+
+#### Acceptance Criteria
+
+1. THE `establish_configuration_settings()` function SHALL accept optional `name`, `logger_name`, `log_basename`, `presence_dir`, `log_directory`, `settings_file`, `extensions`, `service_name`, and `default_configuration` parameters.
+2. THE function SHALL be idempotent — guarded by `CONFIG_SETTINGS_ESTABLISHED` flag.
+3. THE function SHALL call `establish_app_persona()` with the provided parameters.
+4. IF `default_configuration` is provided, THE function SHALL replace `ConfigurationDefaults.DEFAULT_CONFIGURATION`.
+
+---
+
+### Requirement 14: Configuration Synchronization Base
+
+**User Story:** As a framework developer, I want an abstract base for configuration synchronizers, so that new sync backends can be added.
+
+#### Acceptance Criteria
+
+1. THE `ConfigSynchronizerBase` SHALL accept a `storage_uri` and expose it as a property.
+2. THE `try_publish(local_store, venue, user, config_name, credentials?)` method SHALL iterate over config classes (landscapes, topologies, runtimes, credentials), loading each from the local store and publishing to the remote store. Errors SHALL be collected and returned as a list of strings.
+3. THE `try_retrieve(local_store, venue, user, config_name, credentials?)` method SHALL iterate over config classes, retrieving each from the remote store and saving locally. Errors SHALL be collected and returned.
+4. THE `_save_local_config()` method SHALL create directories as needed and write the config in the specified format (JSON or YAML).
+5. THE base SHALL define abstract methods: `_publish_configuration(venue, user, config_class, config_name, config_format, config_info, credentials)` and `_retrieve_configuration(venue, user, config_class, config_name, credentials) -> (format?, data?)`.
+6. THE directory structure for synchronized configs SHALL be: `{storage_uri}/{venue}/{user}/{config_class}/{config_name}.{format}`.
+
+---
+
+### Requirement 15: Synchronization Backends
+
+**User Story:** As a developer, I want multiple synchronization backends, so that configurations can be synced to different storage systems.
+
+#### Acceptance Criteria
+
+1. THE `DirectoryConfigSynchronizer` SHALL implement publish/retrieve using filesystem operations with the venue/user/class directory structure.
+2. THE `CouchDBConfigSynchronizer` SHALL implement publish/retrieve using CouchDB document operations.
+3. THE `MongoDBConfigSynchronizer` SHALL implement publish/retrieve using MongoDB collection operations.
+4. THE `GithubConfigSynchronizer` SHALL implement publish/retrieve using GitHub repository API operations.
+5. EACH backend SHALL handle its specific connection and authentication requirements.
+6. EACH backend SHALL gracefully handle missing optional dependencies.
+
+---
+
+### Requirement 16: Default Values and Sentinels
+
+**User Story:** As a framework developer, I want sentinel values for unset configuration fields, so that unset state is distinguishable from empty values.
+
+#### Acceptance Criteria
+
+1. THE `DefaultValues.NotSet` sentinel SHALL have the string value `"(not-set)"`.
+2. THE sentinel SHALL be used to distinguish between "not configured" and "configured as empty".
+
+---
+
+### Requirement 17: Configuration Categories
+
+**User Story:** As a developer, I want five distinct configuration categories with separate loading and merging, so that different types of configuration data are isolated.
+
+#### Acceptance Criteria
+
+1. THE system SHALL support five categories: Credentials, Landscapes, Topologies, Runtimes, Data Profiles.
+2. EACH category SHALL have independent: names, files, sources, URIs, require flag, use flag, and MergeMap.
+3. THE Runtime category SHALL be initialized with a default configuration containing version and logging levels.
+4. THE Credentials category SHALL NOT be inserted into the application context (security protection).
+5. ALL other categories SHALL be inserted into the application context via `ContextPaths`.
+
+---
+
+## Correctness Properties
+
+- CP-1: For any configuration name present in at least one source, `load_configuration_by_name` returns the configuration from the first source in URI order.
+- CP-2: For any keyphrase, `generate_fernet_key(keyphrase)` is deterministic — the same keyphrase always produces the same key.
+- CP-3: For any plaintext and key, `decrypt_content(key, encrypt_content(key, plaintext)) == plaintext` (encryption round-trip).
+- CP-4: `resolve_configuration_variables()` is idempotent — calling it multiple times has the same effect as calling it once.
+- CP-5: For any configuration type, if `REQUIRE_` is True or names/files are set, then `USE_` is True after variable resolution.
+- CP-6: Configuration maps merge with insertion at position 0, so later-loaded configs have higher priority.
