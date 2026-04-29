@@ -1,28 +1,68 @@
-===============================
-Automation Mojo - Configuration
-===============================
-The 'automojo-configuration' package provides functionality for loading and working with configuration files.
+==============================
+Automation Mojo Configuration
+==============================
 
-=========================
-Features of this Template
-=========================
-* Machine Setup
-* Virtual Environment Setup (Poetry)
-* PyPi Publishing
+The ``automojo-configuration`` package is the configuration-loading and synchronisation layer for the automojo suite. It lets applications and tests pull configuration from a mix of local and remote sources, merge it through well-defined overrides, and (optionally) keep local copies in sync with a remote authority. It depends on ``automojo-errors`` and ``automojo-credentials``, and is consumed widely across the suite.
 
-=================
-Code Organization
-=================
-* .vscode - Common tasks
-* development - This is where the runtime environment scripts are located
-* repository-setup - Scripts for homing your repository and to your checkout and machine setup
-* userguide - Where you put your user guide
-* source/packages - Put your root folder here 'source/packages/(root-module-folder)'
-* workspaces - This is where you add VSCode workspaces templates and where workspaces show up when homed.
-
-==========
-References
+Highlights
 ==========
 
-- `User Guide <userguide/userguide.rst>`
-- `Coding Standards <userguide/10-00-coding-standards.rst>`
+- ``ConfigurationLoader`` top-level entry point that reads from a list of source URIs and produces a merged, normalised configuration.
+- Pluggable ``ConfigurationSourceBase`` with concrete sources: ``DirectorySource``, ``HttpSource``, ``CouchDBSource``, and ``MongoDBSource``.
+- ``ConfigSynchronizerBase`` family with ``DirectoryConfigSynchronizer``, ``CouchDBConfigSynchronizer``, ``MongoDBConfigSynchronizer``, and ``GithubConfigSynchronizer``.
+- Supporting modules for formats, Fernet-based cryptography, option overrides, default values, and normalisation.
+
+Repository Structure
+====================
+
+- ``development/`` - Runtime environment scripts.
+- ``repository-setup/`` - Repository homing and setup scripts.
+- ``source/packages/`` - Package source code.
+- ``source/tests/`` - ``unittest``-based tests.
+- ``specs/`` - Requirements, design, and task documentation.
+- ``userguide/`` - Standards, conventions, and documentation.
+
+Environment Setup
+=================
+
+When working in a Codex container:
+
+.. code-block:: bash
+
+   ./development/setup-agent-container
+
+For local development:
+
+.. code-block:: bash
+
+   ./repository-setup/rehome-repository
+   ./development/setup-envrionment
+
+Running Tests
+=============
+
+Activate the virtual environment:
+
+.. code-block:: bash
+
+   source .venv/bin/activate
+
+Run ``unittest`` tests:
+
+.. code-block:: bash
+
+   python -m unittest discover -s source/tests -p "test_*.py"
+
+Standards and Conventions
+=========================
+
+- Naming conventions: ``userguide/10-02-naming-conventions.rst``
+- Code organization: ``userguide/10-01-code-organization.rst``
+- Coding standards: ``userguide/10-00-coding-standards.rst``
+
+Additional Resources
+====================
+
+- User guide entry point: ``userguide/userguide.rst``
+- Design documentation: ``specs/design.md``
+- Requirements: ``specs/requirements.md``
