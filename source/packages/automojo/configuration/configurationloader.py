@@ -28,6 +28,49 @@ from automojo.configuration.sources.mongodbsource import MongoDBSource
 from automojo.configuration.sources.httpsource import HttpSource
 from automojo.configuration.configurationformat import ConfigurationFormat
 from automojo.configuration.cryptography import generate_fernet_key, decrypt_content
+from automojo.configuration.schemas.vpnconfigschema import VPNBlock, load_vpn_block
+from automojo.configuration.schemas.cloudprovisioningconfigschema import (
+    load_cloud_buckets_block,
+    load_cloud_dns_records_block,
+    load_cloud_images_block,
+    load_cloud_instances_block,
+    load_cloud_keypairs_block,
+    load_cloud_load_balancers_block,
+    load_cloud_networks_block,
+    load_cloud_security_groups_block,
+    load_cloud_subnets_block,
+    load_cloud_volumes_block,
+)
+from automojo.configuration.schemas.workloadprovisioningconfigschema import (
+    load_workload_clusters_block,
+    load_workload_jobs_block,
+    load_workload_services_block,
+    load_workload_venues_block,
+)
+
+
+# Registry of top-level configuration keys mapped to (loader_callable, label).
+# Other automojo packages compose into this registry rather than carrying
+# their own copy of the schema -- see §8 commitment #4 in
+# IMPLEMENTATION-PLAN.md ("one spec, two read paths: typed object + dict").
+TOP_LEVEL_SCHEMA_LOADERS = {
+    "vpn": load_vpn_block,
+    "networks": load_cloud_networks_block,
+    "subnets": load_cloud_subnets_block,
+    "security_groups": load_cloud_security_groups_block,
+    "keypairs": load_cloud_keypairs_block,
+    "images": load_cloud_images_block,
+    "instances": load_cloud_instances_block,
+    "volumes": load_cloud_volumes_block,
+    "buckets": load_cloud_buckets_block,
+    "load_balancers": load_cloud_load_balancers_block,
+    "dns_records": load_cloud_dns_records_block,
+    "workload_venues": load_workload_venues_block,
+    "workload_clusters": load_workload_clusters_block,
+    "workload_jobs": load_workload_jobs_block,
+    "workload_services": load_workload_services_block,
+}
+
 
 class ConfigurationLoader:
     """
@@ -188,6 +231,30 @@ class ConfigurationLoader:
                 raise ConfigurationError(errmsg)
 
         return config_uri, config_info
+
+
+    def load_vpn_block_from_config(self, config_info: dict) -> VPNBlock:
+        """
+            Extracts and validates the top-level ``vpn:`` block from an
+            already-loaded configuration dict.
+
+            :param config_info: A parsed configuration dict (the same shape
+                returned by ``load_configuration_from_file`` or
+                ``load_configuration_by_name``).
+
+            :returns: A typed :class:`VPNBlock`. When the dict has no
+                ``vpn:`` key, the returned block has
+                ``default_plane=AddressPlane.PUBLIC`` and an empty
+                providers list.
+            :raises: ConfigurationError when the ``vpn:`` block is present
+                but malformed.
+        """
+        vpn_data = None
+        if config_info is not None and "vpn" in config_info:
+            vpn_data = config_info["vpn"]
+
+        rtnval = load_vpn_block(data=vpn_data)
+        return rtnval
 
 
     def _initialize(self):
