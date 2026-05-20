@@ -339,6 +339,146 @@ class TestKindImplementationGuard(unittest.TestCase):
         return
 
 
+class FakeCatalogEntry:
+    def __init__(self, *, neutral_name: str) -> None:
+        self.neutral_name = neutral_name
+        return
+
+
+class FakeAcceleratorCatalog:
+    def __init__(self, *, names: List[str]) -> None:
+        self._entries = [FakeCatalogEntry(neutral_name=n) for n in names]
+        return
+
+    def entries(self) -> List[FakeCatalogEntry]:
+        return list(self._entries)
+
+
+class TestNodePoolAcceleratorCatalog(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self._venues = [
+            WorkloadVenueSpec(name="k8s-lab", kind="kubernetes",
+                              credential_ref="k8s-cred"),
+        ]
+        return
+
+    def test_node_pool_accelerator_unknown_model_fails(self):
+        catalog = FakeAcceleratorCatalog(names=["H100_SXM", "L40S"])
+        data = [{"name": "c1", "venue": "k8s-lab",
+                 "accelerator_pools": [
+                     {"name": "h100", "count": 4, "size": "a3-highgpu-8g",
+                      "accelerators": [
+                          {"kind": "GPU", "model": "MADE_UP_GPU",
+                           "count": 8},
+                      ]},
+                 ]}]
+        with self.assertRaises(ConfigurationError) as ctx:
+            load_workload_clusters_block(
+                data=data, venues=self._venues,
+                accelerator_catalog=catalog,
+            )
+        msg = str(ctx.exception)
+        self.assertIn("MADE_UP_GPU", msg)
+        self.assertIn("catalog", msg)
+        return
+
+    def test_node_pool_accelerator_known_model_passes(self):
+        catalog = FakeAcceleratorCatalog(names=["H100_SXM"])
+        data = [{"name": "c1", "venue": "k8s-lab",
+                 "accelerator_pools": [
+                     {"name": "h100", "count": 4, "size": "a3-highgpu-8g",
+                      "accelerators": [
+                          {"kind": "GPU", "model": "H100_SXM", "count": 8},
+                      ]},
+                 ]}]
+        clusters = load_workload_clusters_block(
+            data=data, venues=self._venues, accelerator_catalog=catalog
+        )
+        self.assertEqual(
+            clusters[0].accelerator_pools[0].accelerators[0].model,
+            "H100_SXM",
+        )
+        return
+
+
+class TestCredentialKindCompatibility(unittest.TestCase):
+
+    def test_credential_type_mismatch_fails(self):
+        # A 'slurm' credential paired with kind 'kubernetes' is incompatible.
+        kind_lookup = (lambda cred_ref:
+                       "slurm" if cred_ref == "slurm-cred" else "kubernetes")
+        data = [{"name": "k8s-lab", "kind": "kubernetes",
+                 "credential_ref": "slurm-cred"}]
+        with self.assertRaises(ConfigurationError) as ctx:
+            load_workload_venues_block(
+                data=data,
+                credential_lookup=CRED_LOOKUP,
+                credential_kind_lookup=kind_lookup,
+            )
+        msg = str(ctx.exception)
+        self.assertIn("slurm-cred", msg)
+        self.assertIn("incompatible", msg)
+        return
+
+    def test_credential_kind_match_passes(self):
+        kind_lookup = (lambda cred_ref:
+                       "kubernetes" if cred_ref == "k8s-cred" else "slurm")
+        data = [{"name": "k8s-lab", "kind": "kubernetes",
+                 "credential_ref": "k8s-cred"}]
+        venues = load_workload_venues_block(
+            data=data,
+            credential_lookup=CRED_LOOKUP,
+            credential_kind_lookup=kind_lookup,
+        )
+        self.assertEqual(venues[0].kind, "kubernetes")
+        return
+
+
+class TestLoadBalancerVenueSupport(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self._venues = [
+            WorkloadVenueSpec(name="k8s-lab", kind="kubernetes",
+                              credential_ref="k8s-cred"),
+        ]
+        return
+
+    def test_loadbalancer_exposure_rejected_when_venue_unsupported(self):
+        no_lb_support = (lambda venue_name: False)
+        data = [{"name": "s1", "venue": "k8s-lab", "image": "img",
+                 "exposure": "LoadBalancer"}]
+        with self.assertRaises(ConfigurationError) as ctx:
+            load_workload_services_block(
+                data=data, venues=self._venues,
+                venue_lb_support=no_lb_support,
+            )
+        msg = str(ctx.exception)
+        self.assertIn("LoadBalancer", msg)
+        self.assertIn("k8s-lab", msg)
+        return
+
+    def test_loadbalancer_exposure_accepted_when_venue_supports(self):
+        lb_support = (lambda venue_name: True)
+        data = [{"name": "s1", "venue": "k8s-lab", "image": "img",
+                 "exposure": "LoadBalancer"}]
+        services = load_workload_services_block(
+            data=data, venues=self._venues, venue_lb_support=lb_support
+        )
+        self.assertEqual(services[0].exposure, "LoadBalancer")
+        return
+
+    def test_clusterip_exposure_not_affected_by_lb_support(self):
+        no_lb_support = (lambda venue_name: False)
+        data = [{"name": "s1", "venue": "k8s-lab", "image": "img",
+                 "exposure": "ClusterIP"}]
+        services = load_workload_services_block(
+            data=data, venues=self._venues, venue_lb_support=no_lb_support
+        )
+        self.assertEqual(services[0].exposure, "ClusterIP")
+        return
+
+
 class TestTopLevelRegistry(unittest.TestCase):
 
     def test_workload_keys_registered(self):
