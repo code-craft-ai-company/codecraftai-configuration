@@ -20,7 +20,7 @@
 - [x] 10. Raise `ConfigurationError` with YAML path on failure
 - [x] 11. Validate `kind`, `exposure`, `restart_policy` literal membership
 - [x] 12. Cross-reference `shared_fs_mounts.filesystem_name` to declared shared FS
-- [ ] 13. Cross-reference node-pool accelerators to catalog
+- [x] 13. Cross-reference node-pool accelerators to catalog
 - [x] 14. Validate `workload_venues[*].cloud_provisioner_ref` against cloud venues
 - [x] 15. Resolve `credential_ref` against credential vault per `kind`
 
@@ -31,11 +31,11 @@
 - [x] 18. `test_missing_top_level_key_defaults_to_empty_list`
 - [x] 19. `test_unknown_workload_kind_fails`
 - [x] 20. `test_unknown_exposure_fails`
-- [ ] 21. `test_node_pool_accelerator_unknown_model_fails`
+- [x] 21. `test_node_pool_accelerator_unknown_model_fails`
 - [x] 22. `test_cloud_provisioner_ref_unknown_fails`
-- [ ] 23. `test_credential_type_mismatch_fails`
+- [x] 23. `test_credential_type_mismatch_fails`
 - [x] 24. `test_coexistence_with_cloud_config_in_one_file`
-- [ ] 25. `test_loadbalancer_exposure_rejected_when_venue_unsupported`
+- [x] 25. `test_loadbalancer_exposure_rejected_when_venue_unsupported`
 
 ## Documentation
 

@@ -218,6 +218,15 @@ class WorkloadProvisioningBlock:
 
 CredentialLookup = Callable[[str], Optional[Any]]
 
+# Maps a credential identifier to the workload-venue kind the credential is
+# valid for (e.g. ``kubernetes``). Used to enforce Requirement 2.4 -- a
+# credential whose kind does not match the declared venue ``kind`` is rejected.
+CredentialKindLookup = Callable[[str], Optional[str]]
+
+# Reports whether a workload venue (identified by name) supports exposing a
+# service through a load balancer. Used to enforce Requirement 5.3.
+VenueLoadBalancerSupport = Callable[[str], bool]
+
 
 # ---------------------------------------------------------------------------
 # Validation helpers.
@@ -272,8 +281,32 @@ def _raise_if_errors(*, label: str, err_lines: List[str]) -> None:
     raise ConfigurationError(err_msg)
 
 
+def _accelerator_model_known(*, model_name: str,
+                             accelerator_catalog: Optional[Any]) -> bool:
+    """
+        Reports whether an accelerator neutral name is present in the catalog.
+
+        When no catalog is supplied the model name is accepted unconditionally,
+        deferring catalog enforcement to the caller that owns the catalog.
+
+        :param model_name: The accelerator neutral name to check.
+        :param accelerator_catalog: Optional ``CloudAcceleratorCatalog``.
+
+        :returns: ``True`` when the model is known or no catalog was supplied.
+    """
+    if accelerator_catalog is None:
+        rtnval = True
+        return rtnval
+    known_names = set()
+    for catalog_entry in accelerator_catalog.entries():
+        known_names.add(catalog_entry.neutral_name)
+    rtnval = model_name in known_names
+    return rtnval
+
+
 def _parse_accelerator_requests(*, raw: Any, path: str,
-                                err_lines: List[str]
+                                err_lines: List[str],
+                                accelerator_catalog: Optional[Any] = None
                                 ) -> List[WorkloadAcceleratorRequest]:
     rtnval: List[WorkloadAcceleratorRequest] = []
     if raw is None:
@@ -294,6 +327,16 @@ def _parse_accelerator_requests(*, raw: Any, path: str,
             err_lines=err_lines,
         ):
             continue
+        model_name = entry["model"]
+        if not _accelerator_model_known(
+            model_name=model_name,
+            accelerator_catalog=accelerator_catalog,
+        ):
+            err_lines.append(
+                f"{item_path}.model={model_name!r} is not present in the "
+                f"accelerator catalog."
+            )
+            continue
         req = WorkloadAcceleratorRequest(
             kind=entry["kind"],
             model=entry["model"],
@@ -311,7 +354,8 @@ def _parse_accelerator_requests(*, raw: Any, path: str,
 
 def load_workload_venues_block(*, data: Optional[list] = None,
                                cloud_venues: Optional[List[CloudVenueOverrides]] = None,
-                               credential_lookup: Optional[CredentialLookup] = None
+                               credential_lookup: Optional[CredentialLookup] = None,
+                               credential_kind_lookup: Optional[CredentialKindLookup] = None
                                ) -> List[WorkloadVenueSpec]:
     """
         Parses and validates the ``workload_venues:`` block.
@@ -321,6 +365,9 @@ def load_workload_venues_block(*, data: Optional[list] = None,
             ``cloud_provisioner_ref`` cross-reference.
         :param credential_lookup: Optional callable resolving
             ``credential_ref`` identifiers.
+        :param credential_kind_lookup: Optional callable resolving a
+            ``credential_ref`` to the workload-venue kind the credential is
+            valid for; used to enforce credential-vs-kind compatibility.
 
         :returns: List of parsed ``WorkloadVenueSpec``.
         :raises: ConfigurationError on validation failure.
@@ -331,6 +378,7 @@ def load_workload_venues_block(*, data: Optional[list] = None,
         data=data,
         cloud_venues=cloud_venues_ref,
         credential_lookup=credential_lookup,
+        credential_kind_lookup=credential_kind_lookup,
         err_lines=err_lines,
     )
     _raise_if_errors(label="workload_venues", err_lines=err_lines)
@@ -340,6 +388,7 @@ def load_workload_venues_block(*, data: Optional[list] = None,
 def _parse_workload_venues(*, data: Optional[list],
                            cloud_venues: List[CloudVenueOverrides],
                            credential_lookup: Optional[CredentialLookup],
+                           credential_kind_lookup: Optional[CredentialKindLookup],
                            err_lines: List[str]
                            ) -> List[WorkloadVenueSpec]:
     rtnval: List[WorkloadVenueSpec] = []
@@ -380,6 +429,15 @@ def _parse_workload_venues(*, data: Optional[list],
                     f"to any known credential identifier."
                 )
                 continue
+        if credential_kind_lookup is not None:
+            credential_kind = credential_kind_lookup(cred_ref)
+            if credential_kind is not None and credential_kind != kind:
+                err_lines.append(
+                    f"{path}.credential_ref={cred_ref!r} is a "
+                    f"{credential_kind!r} credential which is incompatible "
+                    f"with the declared venue kind {kind!r}."
+                )
+                continue
         cloud_ref = entry.get("cloud_provisioner_ref")
         if cloud_ref is not None and cloud_ref not in known_cloud:
             err_lines.append(
@@ -399,13 +457,16 @@ def _parse_workload_venues(*, data: Optional[list],
 
 
 def load_workload_clusters_block(*, data: Optional[list] = None,
-                                 venues: Optional[List[WorkloadVenueSpec]] = None
+                                 venues: Optional[List[WorkloadVenueSpec]] = None,
+                                 accelerator_catalog: Optional[Any] = None
                                  ) -> List[WorkloadClusterSpec]:
     """
         Parses and validates the ``workload_clusters:`` block.
 
         :param data: The raw list value of the ``workload_clusters:`` key.
         :param venues: Already-parsed workload venues for cross-reference.
+        :param accelerator_catalog: Optional ``CloudAcceleratorCatalog`` used
+            to validate node-pool ``accelerators[*].model`` neutral names.
 
         :returns: List of parsed ``WorkloadClusterSpec``.
         :raises: ConfigurationError on validation failure.
@@ -413,7 +474,10 @@ def load_workload_clusters_block(*, data: Optional[list] = None,
     err_lines: List[str] = []
     venues_ref = venues if venues is not None else []
     rtnval = _parse_workload_clusters(
-        data=data, venues=venues_ref, err_lines=err_lines
+        data=data,
+        venues=venues_ref,
+        accelerator_catalog=accelerator_catalog,
+        err_lines=err_lines,
     )
     _raise_if_errors(label="workload_clusters", err_lines=err_lines)
     return rtnval
@@ -421,6 +485,7 @@ def load_workload_clusters_block(*, data: Optional[list] = None,
 
 def _parse_workload_clusters(*, data: Optional[list],
                              venues: List[WorkloadVenueSpec],
+                             accelerator_catalog: Optional[Any],
                              err_lines: List[str]
                              ) -> List[WorkloadClusterSpec]:
     rtnval: List[WorkloadClusterSpec] = []
@@ -450,11 +515,13 @@ def _parse_workload_clusters(*, data: Optional[list],
         node_pools = _parse_node_pools(
             raw=entry.get("node_pools", []),
             path=f"{path}.node_pools",
+            accelerator_catalog=accelerator_catalog,
             err_lines=err_lines,
         )
         accelerator_pools = _parse_node_pools(
             raw=entry.get("accelerator_pools", []),
             path=f"{path}.accelerator_pools",
+            accelerator_catalog=accelerator_catalog,
             err_lines=err_lines,
         )
         spec = WorkloadClusterSpec(
@@ -468,6 +535,7 @@ def _parse_workload_clusters(*, data: Optional[list],
 
 
 def _parse_node_pools(*, raw: Any, path: str,
+                      accelerator_catalog: Optional[Any],
                       err_lines: List[str]) -> List[WorkloadNodePoolSpec]:
     rtnval: List[WorkloadNodePoolSpec] = []
     if not isinstance(raw, list):
@@ -490,6 +558,7 @@ def _parse_node_pools(*, raw: Any, path: str,
             raw=entry.get("accelerators"),
             path=f"{item_path}.accelerators",
             err_lines=err_lines,
+            accelerator_catalog=accelerator_catalog,
         )
         pool = WorkloadNodePoolSpec(
             name=entry["name"],
@@ -640,13 +709,18 @@ def _parse_shared_fs_mounts(*, raw: Any, path: str,
 
 
 def load_workload_services_block(*, data: Optional[list] = None,
-                                 venues: Optional[List[WorkloadVenueSpec]] = None
+                                 venues: Optional[List[WorkloadVenueSpec]] = None,
+                                 venue_lb_support: Optional[VenueLoadBalancerSupport] = None
                                  ) -> List[WorkloadServiceSpec]:
     """
         Parses and validates the ``workload_services:`` block.
 
         :param data: The raw list value of the ``workload_services:`` key.
         :param venues: Already-parsed workload venues for cross-reference.
+        :param venue_lb_support: Optional callable reporting whether a venue
+            (by name) supports load-balancer exposure; used to reject
+            ``exposure: LoadBalancer`` on venues whose capability matrix says
+            no LB support.
 
         :returns: List of parsed ``WorkloadServiceSpec``.
         :raises: ConfigurationError on validation failure.
@@ -654,7 +728,10 @@ def load_workload_services_block(*, data: Optional[list] = None,
     err_lines: List[str] = []
     venues_ref = venues if venues is not None else []
     rtnval = _parse_workload_services(
-        data=data, venues=venues_ref, err_lines=err_lines
+        data=data,
+        venues=venues_ref,
+        venue_lb_support=venue_lb_support,
+        err_lines=err_lines,
     )
     _raise_if_errors(label="workload_services", err_lines=err_lines)
     return rtnval
@@ -662,6 +739,7 @@ def load_workload_services_block(*, data: Optional[list] = None,
 
 def _parse_workload_services(*, data: Optional[list],
                              venues: List[WorkloadVenueSpec],
+                             venue_lb_support: Optional[VenueLoadBalancerSupport],
                              err_lines: List[str]
                              ) -> List[WorkloadServiceSpec]:
     rtnval: List[WorkloadServiceSpec] = []
@@ -696,6 +774,14 @@ def _parse_workload_services(*, data: Optional[list],
         )
         if exposure is None:
             continue
+        if exposure == "LoadBalancer" and venue_lb_support is not None:
+            if not venue_lb_support(venue_name):
+                err_lines.append(
+                    f"{path}.exposure='LoadBalancer' is not supported by "
+                    f"venue {venue_name!r}; the venue capability matrix "
+                    f"reports no load-balancer support."
+                )
+                continue
         replicas = int(entry.get("replicas", 1))
         if replicas <= 0:
             err_lines.append(
@@ -730,7 +816,10 @@ def _parse_workload_services(*, data: Optional[list],
 def load_workload_provisioning_block(*, data: Optional[dict] = None,
                                      cloud_venues: Optional[List[CloudVenueOverrides]] = None,
                                      shared_filesystem_names: Optional[List[str]] = None,
-                                     credential_lookup: Optional[CredentialLookup] = None
+                                     credential_lookup: Optional[CredentialLookup] = None,
+                                     credential_kind_lookup: Optional[CredentialKindLookup] = None,
+                                     accelerator_catalog: Optional[Any] = None,
+                                     venue_lb_support: Optional[VenueLoadBalancerSupport] = None
                                      ) -> WorkloadProvisioningBlock:
     """
         Parses and validates the full workload-provisioning portion of a
@@ -743,6 +832,12 @@ def load_workload_provisioning_block(*, data: Optional[dict] = None,
             filesystems used to validate ``shared_fs_mounts``.
         :param credential_lookup: Optional callable resolving
             ``credential_ref`` identifiers.
+        :param credential_kind_lookup: Optional callable resolving a
+            ``credential_ref`` to the venue kind the credential is valid for.
+        :param accelerator_catalog: Optional ``CloudAcceleratorCatalog`` used
+            to validate node-pool ``accelerators[*].model`` neutral names.
+        :param venue_lb_support: Optional callable reporting whether a venue
+            supports load-balancer exposure.
 
         :returns: A typed ``WorkloadProvisioningBlock``.
         :raises: ConfigurationError on validation failure.
@@ -752,10 +847,12 @@ def load_workload_provisioning_block(*, data: Optional[dict] = None,
         data=payload.get("workload_venues"),
         cloud_venues=cloud_venues,
         credential_lookup=credential_lookup,
+        credential_kind_lookup=credential_kind_lookup,
     )
     clusters = load_workload_clusters_block(
         data=payload.get("workload_clusters"),
         venues=venues,
+        accelerator_catalog=accelerator_catalog,
     )
     jobs = load_workload_jobs_block(
         data=payload.get("workload_jobs"),
@@ -765,6 +862,7 @@ def load_workload_provisioning_block(*, data: Optional[dict] = None,
     services = load_workload_services_block(
         data=payload.get("workload_services"),
         venues=venues,
+        venue_lb_support=venue_lb_support,
     )
     rtnval = WorkloadProvisioningBlock(
         workload_venues=venues,

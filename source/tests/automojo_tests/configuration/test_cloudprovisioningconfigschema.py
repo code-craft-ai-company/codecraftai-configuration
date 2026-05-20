@@ -38,13 +38,16 @@ from automojo.configuration.schemas.vpnconfigschema import (
     VPNOverlayProfile,
 )
 from automojo.configuration.schemas.cloudprovisioningconfigschema import (
+    CloudAcceleratorAssignment,
     CloudInstanceSpec,
     CloudNetworkSpec,
     CloudProvisioningBlock,
+    CloudSharedFilesystem,
     CloudSubnetSpec,
     VPNJoinSpec,
     dump_cloud_networks_block,
     dump_cloud_subnets_block,
+    load_cloud_accelerators_block,
     load_cloud_buckets_block,
     load_cloud_dns_records_block,
     load_cloud_images_block,
@@ -54,6 +57,7 @@ from automojo.configuration.schemas.cloudprovisioningconfigschema import (
     load_cloud_networks_block,
     load_cloud_provisioning_block,
     load_cloud_security_groups_block,
+    load_cloud_shared_filesystems_block,
     load_cloud_subnets_block,
     load_cloud_venues_block,
     load_cloud_volumes_block,
@@ -515,12 +519,129 @@ class TestBucketsBlock(unittest.TestCase):
         return
 
 
+class FakeCatalogEntry:
+    def __init__(self, *, neutral_name: str) -> None:
+        self.neutral_name = neutral_name
+        return
+
+
+class FakeAcceleratorCatalog:
+    def __init__(self, *, names: List[str]) -> None:
+        self._entries = [FakeCatalogEntry(neutral_name=n) for n in names]
+        return
+
+    def entries(self) -> List[FakeCatalogEntry]:
+        return list(self._entries)
+
+
+class TestAcceleratorsBlock(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self._instances = [
+            CloudInstanceSpec(name="trainer-01", image="ubuntu-24",
+                              size="large", subnet="sub-a"),
+        ]
+        return
+
+    def test_accelerator_references_unknown_instance_fails(self):
+        data = [
+            {"instance_name": "ghost-instance",
+             "accelerators": [
+                 {"kind": "GPU", "model": "H100_SXM", "count": 8,
+                  "memory_gb": 80},
+             ]},
+        ]
+        with self.assertRaises(ConfigurationError) as ctx:
+            load_cloud_accelerators_block(
+                data=data, instances=self._instances
+            )
+        msg = str(ctx.exception)
+        self.assertIn("ghost-instance", msg)
+        self.assertIn("instance_name", msg)
+        self.assertIn("devices[*].name", msg)
+        return
+
+    def test_accelerator_valid_reference_parses(self):
+        data = [
+            {"instance_name": "trainer-01",
+             "accelerators": [
+                 {"kind": "GPU", "model": "H100_SXM", "count": 8,
+                  "interconnect": "NVSWITCH", "memory_gb": 80},
+             ]},
+        ]
+        assignments = load_cloud_accelerators_block(
+            data=data, instances=self._instances
+        )
+        self.assertEqual(len(assignments), 1)
+        self.assertIsInstance(assignments[0], CloudAcceleratorAssignment)
+        self.assertEqual(assignments[0].instance_name, "trainer-01")
+        self.assertEqual(assignments[0].accelerators[0].model, "H100_SXM")
+        return
+
+    def test_accelerator_unknown_catalog_model_fails(self):
+        catalog = FakeAcceleratorCatalog(names=["H100_SXM"])
+        data = [
+            {"instance_name": "trainer-01",
+             "accelerators": [
+                 {"kind": "GPU", "model": "MADE_UP_GPU", "count": 1,
+                  "memory_gb": 40},
+             ]},
+        ]
+        with self.assertRaises(ConfigurationError) as ctx:
+            load_cloud_accelerators_block(
+                data=data, instances=self._instances,
+                accelerator_catalog=catalog,
+            )
+        msg = str(ctx.exception)
+        self.assertIn("MADE_UP_GPU", msg)
+        self.assertIn("catalog", msg)
+        return
+
+
+class TestSharedFilesystemsBlock(unittest.TestCase):
+
+    def test_shared_fs_attach_or_provision_discriminator(self):
+        # Neither size_tb nor existing_id present -- must fail.
+        data = [{"name": "scratch-fs", "kind": "LUSTRE"}]
+        with self.assertRaises(ConfigurationError) as ctx:
+            load_cloud_shared_filesystems_block(data=data)
+        msg = str(ctx.exception)
+        self.assertIn("size_tb", msg)
+        self.assertIn("existing_id", msg)
+        return
+
+    def test_shared_fs_provision_mode_parses(self):
+        data = [{"name": "scratch-fs", "kind": "LUSTRE", "size_tb": 10}]
+        filesystems = load_cloud_shared_filesystems_block(data=data)
+        self.assertEqual(len(filesystems), 1)
+        self.assertIsInstance(filesystems[0], CloudSharedFilesystem)
+        self.assertEqual(filesystems[0].size_tb, 10)
+        return
+
+    def test_shared_fs_attach_mode_parses(self):
+        data = [{"name": "scratch-fs", "kind": "EFS",
+                 "existing_id": "fs-0abc123"}]
+        filesystems = load_cloud_shared_filesystems_block(data=data)
+        self.assertEqual(len(filesystems), 1)
+        self.assertEqual(filesystems[0].existing_id, "fs-0abc123")
+        return
+
+    def test_shared_fs_unknown_kind_rejected(self):
+        data = [{"name": "scratch-fs", "kind": "NOTAFS", "size_tb": 1}]
+        with self.assertRaises(ConfigurationError) as ctx:
+            load_cloud_shared_filesystems_block(data=data)
+        msg = str(ctx.exception)
+        self.assertIn("NOTAFS", msg)
+        return
+
+
 class TestTopLevelRegistry(unittest.TestCase):
 
     def test_cloud_keys_registered(self):
         expected = (
             "networks", "subnets", "security_groups", "keypairs", "images",
             "instances", "volumes", "buckets", "load_balancers", "dns_records",
+            "accelerators", "shared_filesystems",
         )
         for key in expected:
             self.assertIn(key, TOP_LEVEL_SCHEMA_LOADERS)

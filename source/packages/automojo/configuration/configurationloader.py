@@ -30,6 +30,7 @@ from automojo.configuration.configurationformat import ConfigurationFormat
 from automojo.configuration.cryptography import generate_fernet_key, decrypt_content
 from automojo.configuration.schemas.vpnconfigschema import VPNBlock, load_vpn_block
 from automojo.configuration.schemas.cloudprovisioningconfigschema import (
+    load_cloud_accelerators_block,
     load_cloud_buckets_block,
     load_cloud_dns_records_block,
     load_cloud_images_block,
@@ -38,6 +39,7 @@ from automojo.configuration.schemas.cloudprovisioningconfigschema import (
     load_cloud_load_balancers_block,
     load_cloud_networks_block,
     load_cloud_security_groups_block,
+    load_cloud_shared_filesystems_block,
     load_cloud_subnets_block,
     load_cloud_volumes_block,
 )
@@ -65,6 +67,8 @@ TOP_LEVEL_SCHEMA_LOADERS = {
     "buckets": load_cloud_buckets_block,
     "load_balancers": load_cloud_load_balancers_block,
     "dns_records": load_cloud_dns_records_block,
+    "accelerators": load_cloud_accelerators_block,
+    "shared_filesystems": load_cloud_shared_filesystems_block,
     "workload_venues": load_workload_venues_block,
     "workload_clusters": load_workload_clusters_block,
     "workload_jobs": load_workload_jobs_block,

@@ -15,6 +15,7 @@ __credits__ = []
 
 
 import ipaddress
+import logging
 import os
 
 from dataclasses import dataclass, field
@@ -23,6 +24,9 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from automojo.errors.exceptions import ConfigurationError
 
 from automojo.configuration.schemas.vpnconfigschema import VPNBlock
+
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -65,11 +69,113 @@ except ImportError:
         hostname_template: Optional[str] = None
 
 
+try:
+    from automojo.provisioning.model.cloud.cloudacceleratorspec import (  # type: ignore
+        CloudAcceleratorSpec,
+    )
+except ImportError:
+    @dataclass(frozen=True)
+    class CloudAcceleratorSpec:
+        """
+            Venue-neutral accelerator descriptor (local fallback).
+
+            :param kind: Accelerator kind (``GPU``, ``TPU``, ``IPU``, ``ASIC``).
+            :param model: Catalog neutral name (e.g. ``H100_SXM``).
+            :param count: Number of accelerators per host.
+            :param interconnect: Inter-device interconnect technology.
+            :param memory_gb: Per-accelerator memory in GB.
+        """
+        kind: str
+        model: str
+        count: int
+        interconnect: str = "NONE"
+        memory_gb: Optional[int] = None
+
+
+try:
+    from automojo.provisioning.model.cloud.cloudinterconnect import (  # type: ignore
+        CloudInterconnect,
+    )
+except ImportError:
+    @dataclass(frozen=True)
+    class CloudInterconnect:
+        """
+            Venue-neutral inter-host fabric descriptor (local fallback).
+
+            :param kind: Interconnect fabric kind.
+            :param bandwidth_gbps: Bandwidth in gigabits per second.
+            :param topology: Fabric topology.
+        """
+        kind: str
+        bandwidth_gbps: int
+        topology: str = "NONE"
+
+
+try:
+    from automojo.provisioning.model.cloud.sharedfsmountspec import (  # type: ignore
+        SharedFsMountSpec,
+    )
+except ImportError:
+    @dataclass(frozen=True)
+    class SharedFsMountSpec:
+        """
+            Mount declaration tying a shared filesystem to an instance
+            (local fallback).
+
+            :param filesystem_name: Name of the referenced shared filesystem.
+            :param target_instance: Name of the receiving instance.
+            :param mount_path: Absolute mount path on the target.
+            :param mount_options: Optional mount option strings.
+        """
+        filesystem_name: str
+        target_instance: str
+        mount_path: str
+        mount_options: List[str] = field(default_factory=list)
+
+
+try:
+    from automojo.provisioning.model.cloud.cloudsharedfilesystem import (  # type: ignore
+        CloudSharedFilesystem,
+    )
+except ImportError:
+    @dataclass(frozen=True)
+    class CloudSharedFilesystem:
+        """
+            Venue-neutral shared filesystem descriptor (local fallback).
+
+            :param name: Filesystem identifier.
+            :param kind: One of the supported shared filesystem kinds.
+            :param size_tb: Size in terabytes (``None`` in attach-only mode).
+            :param throughput_gbps: Optional throughput hint.
+            :param mount_targets: List of ``SharedFsMountSpec`` entries.
+            :param existing_id: Existing filesystem identifier (attach mode).
+            :param tags: Optional list of single-key tag dicts.
+        """
+        name: str
+        kind: str
+        size_tb: Optional[int] = None
+        throughput_gbps: Optional[int] = None
+        mount_targets: List[SharedFsMountSpec] = field(default_factory=list)
+        existing_id: Optional[str] = None
+        tags: List[Dict[str, Any]] = field(default_factory=list)
+
+
 # ---------------------------------------------------------------------------
 # Enum-like literal sets.
 # ---------------------------------------------------------------------------
 
 SUPPORTED_VPN_PROVIDERS_FOR_JOIN: Tuple[str, ...] = ("tailscale", "twingate")
+
+SUPPORTED_ACCELERATOR_KINDS: Tuple[str, ...] = ("GPU", "TPU", "IPU", "ASIC")
+
+SUPPORTED_ACCELERATOR_INTERCONNECTS: Tuple[str, ...] = (
+    "NONE", "PCIE", "NVLINK", "NVSWITCH", "INFINITY_FABRIC",
+)
+
+SUPPORTED_SHARED_FS_KINDS: Tuple[str, ...] = (
+    "WEKA", "LUSTRE", "VAST", "GPFS", "EFS",
+    "FILESTORE", "AZUREFILES", "BEEGFS", "VENUE_NATIVE",
+)
 
 SUPPORTED_VOLUME_KINDS: Tuple[str, ...] = ("block", "object", "shared")
 
@@ -275,6 +381,22 @@ class CloudDnsRecordSpec:
 
 
 @dataclass(frozen=True)
+class CloudAcceleratorAssignment:
+    """
+        Typed representation of an ``accelerators[*]`` entry.
+
+        Each entry binds one declared instance to a list of venue-neutral
+        accelerator specifications.
+
+        :param instance_name: Name of a declared ``devices[*]`` /
+            ``instances[*]`` entry the accelerators are attached to.
+        :param accelerators: List of ``CloudAcceleratorSpec`` descriptors.
+    """
+    instance_name: str
+    accelerators: List[CloudAcceleratorSpec] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class CloudVenueOverrides:
     """
         Typed representation of ``venues.<name>:`` override block.
@@ -301,6 +423,8 @@ class CloudProvisioningBlock:
         :param buckets: Parsed buckets.
         :param load_balancers: Parsed load balancers.
         :param dns_records: Parsed DNS records.
+        :param accelerators: Parsed accelerator assignments.
+        :param shared_filesystems: Parsed shared filesystems.
         :param venues: Parsed per-venue overrides.
     """
     networks: List[CloudNetworkSpec] = field(default_factory=list)
@@ -313,6 +437,8 @@ class CloudProvisioningBlock:
     buckets: List[CloudBucketSpec] = field(default_factory=list)
     load_balancers: List[CloudLoadBalancerSpec] = field(default_factory=list)
     dns_records: List[CloudDnsRecordSpec] = field(default_factory=list)
+    accelerators: List[CloudAcceleratorAssignment] = field(default_factory=list)
+    shared_filesystems: List[CloudSharedFilesystem] = field(default_factory=list)
     venues: List[CloudVenueOverrides] = field(default_factory=list)
 
 
@@ -1146,6 +1272,288 @@ def _parse_dns_records(*, data: Optional[list],
     return rtnval
 
 
+def load_cloud_accelerators_block(*, data: Optional[list] = None,
+                                  instances: Optional[List[CloudInstanceSpec]] = None,
+                                  accelerator_catalog: Optional[Any] = None
+                                  ) -> List[CloudAcceleratorAssignment]:
+    """
+        Parses and validates the ``accelerators:`` block.
+
+        Each entry binds an instance to a list of venue-neutral accelerator
+        specifications. The ``instance_name`` is cross-referenced against the
+        declared instances / devices, and each accelerator's ``model`` neutral
+        name is cross-referenced against the accelerator catalog when one is
+        supplied.
+
+        :param data: The raw list value of the ``accelerators:`` key.
+        :param instances: Already-parsed instances used to validate
+            ``instance_name`` cross-references.
+        :param accelerator_catalog: Optional ``CloudAcceleratorCatalog`` used
+            to validate accelerator ``model`` neutral names.
+
+        :returns: List of parsed ``CloudAcceleratorAssignment`` instances.
+        :raises: ConfigurationError on validation failure.
+    """
+    err_lines: List[str] = []
+    instances_ref = instances if instances is not None else []
+    rtnval = _parse_accelerators(
+        data=data,
+        instances=instances_ref,
+        accelerator_catalog=accelerator_catalog,
+        err_lines=err_lines,
+    )
+    _raise_if_errors(label="accelerators", err_lines=err_lines)
+    return rtnval
+
+
+def _parse_accelerators(*, data: Optional[list],
+                        instances: List[CloudInstanceSpec],
+                        accelerator_catalog: Optional[Any],
+                        err_lines: List[str]
+                        ) -> List[CloudAcceleratorAssignment]:
+    rtnval: List[CloudAcceleratorAssignment] = []
+    raw_list = data if data is not None else []
+    if not isinstance(raw_list, list):
+        err_lines.append("accelerators must be a list.")
+        return rtnval
+    known_instances = {i.name for i in instances}
+    for idx, entry in enumerate(raw_list):
+        path = f"accelerators[{idx}]"
+        if not _require_mapping(entry=entry, path=path, err_lines=err_lines):
+            continue
+        if not _require_keys(
+            entry=entry,
+            required=("instance_name", "accelerators"),
+            path=path,
+            err_lines=err_lines,
+        ):
+            continue
+        instance_name = entry["instance_name"]
+        if len(known_instances) > 0 and instance_name not in known_instances:
+            err_lines.append(
+                f"{path}.instance_name={instance_name!r} does not reference "
+                f"any declared devices[*].name / instances[*].name."
+            )
+            continue
+        specs = _parse_accelerator_specs(
+            raw=entry["accelerators"],
+            path=f"{path}.accelerators",
+            accelerator_catalog=accelerator_catalog,
+            err_lines=err_lines,
+        )
+        assignment = CloudAcceleratorAssignment(
+            instance_name=instance_name,
+            accelerators=specs,
+        )
+        rtnval.append(assignment)
+    return rtnval
+
+
+def _parse_accelerator_specs(*, raw: Any, path: str,
+                             accelerator_catalog: Optional[Any],
+                             err_lines: List[str]
+                             ) -> List[CloudAcceleratorSpec]:
+    rtnval: List[CloudAcceleratorSpec] = []
+    if not isinstance(raw, list):
+        err_lines.append(f"{path} must be a list.")
+        return rtnval
+    for idx, entry in enumerate(raw):
+        item_path = f"{path}[{idx}]"
+        if not _require_mapping(
+            entry=entry, path=item_path, err_lines=err_lines
+        ):
+            continue
+        if not _require_keys(
+            entry=entry,
+            required=("kind", "model", "count"),
+            path=item_path,
+            err_lines=err_lines,
+        ):
+            continue
+        kind = _validate_enum(
+            raw=entry["kind"],
+            accepted=SUPPORTED_ACCELERATOR_KINDS,
+            path=f"{item_path}.kind",
+            err_lines=err_lines,
+        )
+        if kind is None:
+            continue
+        interconnect = _validate_enum(
+            raw=entry.get("interconnect", "NONE"),
+            accepted=SUPPORTED_ACCELERATOR_INTERCONNECTS,
+            path=f"{item_path}.interconnect",
+            err_lines=err_lines,
+        )
+        if interconnect is None:
+            continue
+        model_name = entry["model"]
+        if not _accelerator_model_known(
+            model_name=model_name,
+            accelerator_catalog=accelerator_catalog,
+        ):
+            err_lines.append(
+                f"{item_path}.model={model_name!r} is not present in the "
+                f"accelerator catalog."
+            )
+            continue
+        spec = CloudAcceleratorSpec(
+            kind=kind,
+            model=model_name,
+            count=int(entry["count"]),
+            interconnect=interconnect,
+            memory_gb=entry.get("memory_gb"),
+        )
+        rtnval.append(spec)
+    return rtnval
+
+
+def _accelerator_model_known(*, model_name: str,
+                             accelerator_catalog: Optional[Any]) -> bool:
+    """
+        Reports whether an accelerator neutral name is present in the catalog.
+
+        When no catalog is supplied the model name is accepted unconditionally,
+        deferring catalog enforcement to the caller that owns the catalog.
+
+        :param model_name: The accelerator neutral name to check.
+        :param accelerator_catalog: Optional ``CloudAcceleratorCatalog``.
+
+        :returns: ``True`` when the model is known or no catalog was supplied.
+    """
+    if accelerator_catalog is None:
+        rtnval = True
+        return rtnval
+    known_names = set()
+    for catalog_entry in accelerator_catalog.entries():
+        known_names.add(catalog_entry.neutral_name)
+    rtnval = model_name in known_names
+    return rtnval
+
+
+def load_cloud_shared_filesystems_block(*, data: Optional[list] = None,
+                                        instances: Optional[List[CloudInstanceSpec]] = None
+                                        ) -> List[CloudSharedFilesystem]:
+    """
+        Parses and validates the ``shared_filesystems:`` block.
+
+        Each entry must declare either ``size_tb`` (provision mode) or
+        ``existing_id`` (attach mode) -- the attach-or-provision discriminator.
+
+        :param data: The raw list value of the ``shared_filesystems:`` key.
+        :param instances: Already-parsed instances used to validate
+            ``mount_targets[*].target_instance`` cross-references.
+
+        :returns: List of parsed ``CloudSharedFilesystem`` instances.
+        :raises: ConfigurationError on validation failure.
+    """
+    err_lines: List[str] = []
+    instances_ref = instances if instances is not None else []
+    rtnval = _parse_shared_filesystems(
+        data=data, instances=instances_ref, err_lines=err_lines
+    )
+    _raise_if_errors(label="shared_filesystems", err_lines=err_lines)
+    return rtnval
+
+
+def _parse_shared_filesystems(*, data: Optional[list],
+                              instances: List[CloudInstanceSpec],
+                              err_lines: List[str]
+                              ) -> List[CloudSharedFilesystem]:
+    rtnval: List[CloudSharedFilesystem] = []
+    raw_list = data if data is not None else []
+    if not isinstance(raw_list, list):
+        err_lines.append("shared_filesystems must be a list.")
+        return rtnval
+    known_instances = {i.name for i in instances}
+    for idx, entry in enumerate(raw_list):
+        path = f"shared_filesystems[{idx}]"
+        if not _require_mapping(entry=entry, path=path, err_lines=err_lines):
+            continue
+        if not _require_keys(
+            entry=entry,
+            required=("name", "kind"),
+            path=path,
+            err_lines=err_lines,
+        ):
+            continue
+        kind = _validate_enum(
+            raw=entry["kind"],
+            accepted=SUPPORTED_SHARED_FS_KINDS,
+            path=f"{path}.kind",
+            err_lines=err_lines,
+        )
+        if kind is None:
+            continue
+        size_tb = entry.get("size_tb")
+        existing_id = entry.get("existing_id")
+        if size_tb is None and existing_id is None:
+            err_lines.append(
+                f"{path} must declare either 'size_tb' (provision) or "
+                f"'existing_id' (attach)."
+            )
+            continue
+        mount_targets = _parse_shared_fs_mount_targets(
+            raw=entry.get("mount_targets", []),
+            path=f"{path}.mount_targets",
+            filesystem_name=entry["name"],
+            known_instances=known_instances,
+            err_lines=err_lines,
+        )
+        spec = CloudSharedFilesystem(
+            name=entry["name"],
+            kind=kind,
+            size_tb=int(size_tb) if size_tb is not None else None,
+            throughput_gbps=(
+                int(entry["throughput_gbps"])
+                if entry.get("throughput_gbps") is not None else None
+            ),
+            mount_targets=mount_targets,
+            existing_id=existing_id,
+            tags=list(entry.get("tags", [])),
+        )
+        rtnval.append(spec)
+    return rtnval
+
+
+def _parse_shared_fs_mount_targets(*, raw: Any, path: str,
+                                   filesystem_name: str,
+                                   known_instances: set,
+                                   err_lines: List[str]
+                                   ) -> List[SharedFsMountSpec]:
+    rtnval: List[SharedFsMountSpec] = []
+    if not isinstance(raw, list):
+        err_lines.append(f"{path} must be a list.")
+        return rtnval
+    for idx, entry in enumerate(raw):
+        item_path = f"{path}[{idx}]"
+        if not _require_mapping(
+            entry=entry, path=item_path, err_lines=err_lines
+        ):
+            continue
+        if not _require_keys(
+            entry=entry,
+            required=("target_instance", "mount_path"),
+            path=item_path,
+            err_lines=err_lines,
+        ):
+            continue
+        target_instance = entry["target_instance"]
+        if len(known_instances) > 0 and target_instance not in known_instances:
+            err_lines.append(
+                f"{item_path}.target_instance={target_instance!r} does not "
+                f"reference any declared devices[*].name / instances[*].name."
+            )
+            continue
+        mount = SharedFsMountSpec(
+            filesystem_name=entry.get("filesystem_name", filesystem_name),
+            target_instance=target_instance,
+            mount_path=entry["mount_path"],
+            mount_options=list(entry.get("mount_options", [])),
+        )
+        rtnval.append(mount)
+    return rtnval
+
+
 def load_cloud_venues_block(*, data: Optional[dict] = None
                             ) -> List[CloudVenueOverrides]:
     """
@@ -1181,6 +1589,29 @@ def load_cloud_venues_block(*, data: Optional[dict] = None
     return rtnval
 
 
+def warn_unknown_venue_override(*, venue_name: str,
+                                override_key: str) -> None:
+    """
+        Logs a warning when a venue plugin reports an unknown override key.
+
+        Per Requirement 7.3, an unknown override key is forward-compatible and
+        therefore a warning rather than an error -- the venue plugin owns its
+        own override schema and may not recognise newer keys.
+
+        :param venue_name: Identifier of the venue that reported the override.
+        :param override_key: The override key the plugin did not recognise.
+    """
+    warn_lines = [
+        "Venue plugin reported an unknown override key.",
+        f"VENUE: {venue_name}",
+        f"OVERRIDE KEY: {override_key}",
+        "Overrides are forward-compatible; the key was left unchanged.",
+    ]
+    warn_msg = os.linesep.join(warn_lines)
+    logger.warning(warn_msg)
+    return
+
+
 def _raise_if_errors(*, label: str, err_lines: List[str]) -> None:
     """
         Raises a ``ConfigurationError`` aggregating every accumulated error.
@@ -1205,7 +1636,8 @@ def _raise_if_errors(*, label: str, err_lines: List[str]) -> None:
 
 def load_cloud_provisioning_block(*, data: Optional[dict] = None,
                                   vpn_block: Optional[VPNBlock] = None,
-                                  credential_lookup: Optional[CredentialLookup] = None
+                                  credential_lookup: Optional[CredentialLookup] = None,
+                                  accelerator_catalog: Optional[Any] = None
                                   ) -> CloudProvisioningBlock:
     """
         Parses and validates the full cloud-provisioning portion of a config
@@ -1217,6 +1649,9 @@ def load_cloud_provisioning_block(*, data: Optional[dict] = None,
             cross-reference validation of ``instances[*].vpn_join``.
         :param credential_lookup: Optional callable resolving
             ``vpn_join.control_plane_credential`` identifiers.
+        :param accelerator_catalog: Optional ``CloudAcceleratorCatalog`` used
+            to validate ``accelerators[*].accelerators[*].model`` neutral
+            names.
 
         :returns: A typed ``CloudProvisioningBlock``.
         :raises: ConfigurationError when any block fails validation.
@@ -1248,6 +1683,15 @@ def load_cloud_provisioning_block(*, data: Optional[dict] = None,
         instances=instances,
     )
     dns_records = load_cloud_dns_records_block(data=payload.get("dns_records"))
+    accelerators = load_cloud_accelerators_block(
+        data=payload.get("accelerators"),
+        instances=instances,
+        accelerator_catalog=accelerator_catalog,
+    )
+    shared_filesystems = load_cloud_shared_filesystems_block(
+        data=payload.get("shared_filesystems"),
+        instances=instances,
+    )
     venues = load_cloud_venues_block(data=payload.get("venues"))
 
     rtnval = CloudProvisioningBlock(
@@ -1261,6 +1705,8 @@ def load_cloud_provisioning_block(*, data: Optional[dict] = None,
         buckets=buckets,
         load_balancers=load_balancers,
         dns_records=dns_records,
+        accelerators=accelerators,
+        shared_filesystems=shared_filesystems,
         venues=venues,
     )
     return rtnval
