@@ -25,139 +25,29 @@ from automojo.errors.exceptions import ConfigurationError
 
 from automojo.configuration.schemas.vpnconfigschema import VPNBlock
 
+# ---------------------------------------------------------------------------
+# Cross-repository type imports.
+#
+# The canonical model classes live in ``automojo-provisioning``. They are
+# imported hard so that a missing or mis-pathed core dependency fails loudly
+# at import time rather than silently substituting a structurally divergent
+# local stand-in (the previous fallback ``VPNJoinSpec`` made
+# ``hostname_template`` optional while the canonical class requires it).
+# ---------------------------------------------------------------------------
+
+from automojo.provisioning.model.exceptions import SchemaValidationError
+from automojo.provisioning.model.vpn.vpnjoinspec import VPNJoinSpec
+from automojo.provisioning.model.cloud.cloudacceleratorspec import (
+    CloudAcceleratorSpec,
+)
+from automojo.provisioning.model.cloud.cloudinterconnect import CloudInterconnect
+from automojo.provisioning.model.cloud.sharedfsmountspec import SharedFsMountSpec
+from automojo.provisioning.model.cloud.cloudsharedfilesystem import (
+    CloudSharedFilesystem,
+)
+
 
 logger = logging.getLogger(__name__)
-
-
-# ---------------------------------------------------------------------------
-# Cross-repository type fallbacks.
-#
-# The canonical model classes live in ``automojo-provisioning`` (Phase 1a).
-# Until that package publishes its modules this schema falls back to lightweight
-# local dataclasses that match the upstream design closely enough for callers
-# to receive typed objects from this loader. When the upstream package lands,
-# the ``try`` imports succeed and the local fallbacks are simply not used.
-# ---------------------------------------------------------------------------
-
-try:
-    from automojo.provisioning.models.cloudresourceprofile import (  # type: ignore
-        CloudResourceProfile,
-    )
-except ImportError:
-    CloudResourceProfile = None  # type: ignore
-
-
-try:
-    from automojo.provisioning.models.vpnjoinspec import VPNJoinSpec  # type: ignore
-except ImportError:
-    @dataclass(frozen=True)
-    class VPNJoinSpec:
-        """
-            Per-instance description of how a device joins a VPN overlay.
-
-            :param provider: One of the supported VPN providers
-                (``tailscale`` or ``twingate``).
-            :param control_plane_credential: Identifier of the credential
-                used to talk to the control plane.
-            :param advertise_tags: Tags advertised on the overlay.
-            :param hostname_template: Optional hostname template used when
-                joining the overlay.
-        """
-        provider: str
-        control_plane_credential: str
-        advertise_tags: List[str] = field(default_factory=list)
-        hostname_template: Optional[str] = None
-
-
-try:
-    from automojo.provisioning.model.cloud.cloudacceleratorspec import (  # type: ignore
-        CloudAcceleratorSpec,
-    )
-except ImportError:
-    @dataclass(frozen=True)
-    class CloudAcceleratorSpec:
-        """
-            Venue-neutral accelerator descriptor (local fallback).
-
-            :param kind: Accelerator kind (``GPU``, ``TPU``, ``IPU``, ``ASIC``).
-            :param model: Catalog neutral name (e.g. ``H100_SXM``).
-            :param count: Number of accelerators per host.
-            :param interconnect: Inter-device interconnect technology.
-            :param memory_gb: Per-accelerator memory in GB.
-        """
-        kind: str
-        model: str
-        count: int
-        interconnect: str = "NONE"
-        memory_gb: Optional[int] = None
-
-
-try:
-    from automojo.provisioning.model.cloud.cloudinterconnect import (  # type: ignore
-        CloudInterconnect,
-    )
-except ImportError:
-    @dataclass(frozen=True)
-    class CloudInterconnect:
-        """
-            Venue-neutral inter-host fabric descriptor (local fallback).
-
-            :param kind: Interconnect fabric kind.
-            :param bandwidth_gbps: Bandwidth in gigabits per second.
-            :param topology: Fabric topology.
-        """
-        kind: str
-        bandwidth_gbps: int
-        topology: str = "NONE"
-
-
-try:
-    from automojo.provisioning.model.cloud.sharedfsmountspec import (  # type: ignore
-        SharedFsMountSpec,
-    )
-except ImportError:
-    @dataclass(frozen=True)
-    class SharedFsMountSpec:
-        """
-            Mount declaration tying a shared filesystem to an instance
-            (local fallback).
-
-            :param filesystem_name: Name of the referenced shared filesystem.
-            :param target_instance: Name of the receiving instance.
-            :param mount_path: Absolute mount path on the target.
-            :param mount_options: Optional mount option strings.
-        """
-        filesystem_name: str
-        target_instance: str
-        mount_path: str
-        mount_options: List[str] = field(default_factory=list)
-
-
-try:
-    from automojo.provisioning.model.cloud.cloudsharedfilesystem import (  # type: ignore
-        CloudSharedFilesystem,
-    )
-except ImportError:
-    @dataclass(frozen=True)
-    class CloudSharedFilesystem:
-        """
-            Venue-neutral shared filesystem descriptor (local fallback).
-
-            :param name: Filesystem identifier.
-            :param kind: One of the supported shared filesystem kinds.
-            :param size_tb: Size in terabytes (``None`` in attach-only mode).
-            :param throughput_gbps: Optional throughput hint.
-            :param mount_targets: List of ``SharedFsMountSpec`` entries.
-            :param existing_id: Existing filesystem identifier (attach mode).
-            :param tags: Optional list of single-key tag dicts.
-        """
-        name: str
-        kind: str
-        size_tb: Optional[int] = None
-        throughput_gbps: Optional[int] = None
-        mount_targets: List[SharedFsMountSpec] = field(default_factory=list)
-        existing_id: Optional[str] = None
-        tags: List[Dict[str, Any]] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -539,6 +429,76 @@ def _validate_enum(*, raw: Any, accepted: Tuple[str, ...], path: str,
     return rtnval
 
 
+def _validate_int(*, raw: Any, path: str, err_lines: List[str],
+                  positive: bool = False) -> Optional[int]:
+    """
+        Converts ``raw`` to an ``int``, accumulating an error on failure
+        instead of letting a ``ValueError`` / ``TypeError`` escape.
+
+        :param raw: The candidate value.
+        :param path: YAML-like path used in the error message.
+        :param err_lines: Mutable list of error lines.
+        :param positive: When ``True`` the converted value must be > 0.
+
+        :returns: The converted ``int`` on success, ``None`` otherwise.
+    """
+    if isinstance(raw, bool):
+        err_lines.append(f"{path}={raw!r} must be an integer.")
+        rtnval = None
+        return rtnval
+    try:
+        converted = int(raw)
+    except (ValueError, TypeError):
+        err_lines.append(f"{path}={raw!r} must be an integer.")
+        rtnval = None
+        return rtnval
+    if positive and converted <= 0:
+        err_lines.append(f"{path}={converted} must be greater than 0.")
+        rtnval = None
+        return rtnval
+    rtnval = converted
+    return rtnval
+
+
+def _normalise_tags(*, raw: Any, path: str,
+                    err_lines: List[str]) -> Optional[Dict[str, Any]]:
+    """
+        Normalises a ``tags`` value to a flat ``Dict[str, Any]``.
+
+        Accepts either an already-flat mapping or a list of single-key
+        tag dicts (the historical config convention). ``None`` yields an
+        empty dict.
+
+        :param raw: The candidate ``tags`` value.
+        :param path: YAML-like path used in the error message.
+        :param err_lines: Mutable list of error lines.
+
+        :returns: A flat dict on success, ``None`` on failure.
+    """
+    if raw is None:
+        rtnval = {}
+        return rtnval
+    if isinstance(raw, dict):
+        rtnval = dict(raw)
+        return rtnval
+    if isinstance(raw, list):
+        flattened: Dict[str, Any] = {}
+        for tag_entry in raw:
+            if not isinstance(tag_entry, dict):
+                err_lines.append(
+                    f"{path} list entries must be single-key mappings."
+                )
+                rtnval = None
+                return rtnval
+            for key, value in tag_entry.items():
+                flattened[key] = value
+        rtnval = flattened
+        return rtnval
+    err_lines.append(f"{path} must be a mapping or a list of mappings.")
+    rtnval = None
+    return rtnval
+
+
 # ---------------------------------------------------------------------------
 # Per-block loaders.
 # ---------------------------------------------------------------------------
@@ -753,10 +713,20 @@ def _parse_sg_rules(*, raw: Any, path: str,
         )
         if protocol is None:
             continue
+        from_port = _validate_int(
+            raw=entry["from_port"], path=f"{item_path}.from_port",
+            err_lines=err_lines,
+        )
+        to_port = _validate_int(
+            raw=entry["to_port"], path=f"{item_path}.to_port",
+            err_lines=err_lines,
+        )
+        if from_port is None or to_port is None:
+            continue
         rule = CloudSecurityGroupRule(
             protocol=protocol,
-            from_port=int(entry["from_port"]),
-            to_port=int(entry["to_port"]),
+            from_port=from_port,
+            to_port=to_port,
             source_cidrs=list(entry.get("source_cidrs", [])),
             description=entry.get("description"),
         )
@@ -911,10 +881,13 @@ def _parse_instances(*, data: Optional[list],
     known_subnets = {s.name for s in subnets}
     known_sgs = {g.name for g in security_groups}
     known_keypairs = {k.name for k in keypairs}
-    known_vpn_providers = set()
+    # Maps an overlay-profile name to its provider kind ("tailscale" /
+    # "twingate"). The canonical VPNJoinSpec stores the provider kind, not
+    # the profile name, so the kind is resolved here from the VPN block.
+    vpn_profile_kinds: Dict[str, str] = {}
     if vpn_block is not None:
         for profile in vpn_block.providers:
-            known_vpn_providers.add(profile.name)
+            vpn_profile_kinds[profile.name] = profile.provider
     for idx, entry in enumerate(raw_list):
         path = f"instances[{idx}]"
         if not _require_mapping(entry=entry, path=path, err_lines=err_lines):
@@ -961,7 +934,7 @@ def _parse_instances(*, data: Optional[list],
         vpn_join = _parse_vpn_join(
             raw=entry.get("vpn_join"),
             path=f"{path}.vpn_join",
-            known_vpn_providers=known_vpn_providers,
+            vpn_profile_kinds=vpn_profile_kinds,
             credential_lookup=credential_lookup,
             err_lines=err_lines,
         )
@@ -981,9 +954,27 @@ def _parse_instances(*, data: Optional[list],
 
 
 def _parse_vpn_join(*, raw: Any, path: str,
-                    known_vpn_providers: set,
+                    vpn_profile_kinds: Dict[str, str],
                     credential_lookup: Optional[CredentialLookup],
                     err_lines: List[str]) -> Optional[VPNJoinSpec]:
+    """
+        Validates and constructs a single ``instances[*].vpn_join`` entry.
+
+        ``vpn_join.provider`` references a ``vpn.providers[*].name`` overlay
+        profile. The canonical ``VPNJoinSpec`` stores the provider *kind*
+        (``tailscale`` / ``twingate``), so the kind is resolved here from
+        ``vpn_profile_kinds``.
+
+        :param raw: The raw ``vpn_join`` mapping, or ``None``.
+        :param path: YAML-like path used in error messages.
+        :param vpn_profile_kinds: Mapping of overlay-profile name to
+            provider kind, built from the parsed VPN block.
+        :param credential_lookup: Optional callable resolving the
+            ``control_plane_credential`` identifier.
+        :param err_lines: Mutable list of error lines.
+
+        :returns: A ``VPNJoinSpec`` on success, ``None`` otherwise.
+    """
     if raw is None:
         rtnval = None
         return rtnval
@@ -992,20 +983,23 @@ def _parse_vpn_join(*, raw: Any, path: str,
         return rtnval
     if not _require_keys(
         entry=raw,
-        required=("provider", "control_plane_credential"),
+        required=("provider", "control_plane_credential", "hostname_template"),
         path=path,
         err_lines=err_lines,
     ):
         rtnval = None
         return rtnval
     provider_name = raw["provider"]
-    if len(known_vpn_providers) > 0 and provider_name not in known_vpn_providers:
-        err_lines.append(
-            f"{path}.provider={provider_name!r} does not reference any "
-            f"declared vpn.providers[*].name."
-        )
-        rtnval = None
-        return rtnval
+    provider_kind = provider_name
+    if len(vpn_profile_kinds) > 0:
+        if provider_name not in vpn_profile_kinds:
+            err_lines.append(
+                f"{path}.provider={provider_name!r} does not reference any "
+                f"declared vpn.providers[*].name."
+            )
+            rtnval = None
+            return rtnval
+        provider_kind = vpn_profile_kinds[provider_name]
     cred_ref = raw["control_plane_credential"]
     if credential_lookup is not None:
         resolved = credential_lookup(cred_ref)
@@ -1016,12 +1010,20 @@ def _parse_vpn_join(*, raw: Any, path: str,
             )
             rtnval = None
             return rtnval
-    rtnval = VPNJoinSpec(
-        provider=provider_name,
-        control_plane_credential=cred_ref,
-        advertise_tags=list(raw.get("advertise_tags", [])),
-        hostname_template=raw.get("hostname_template"),
-    )
+    try:
+        rtnval = VPNJoinSpec(
+            provider=provider_kind,
+            control_plane_credential=cred_ref,
+            advertise_tags=list(raw.get("advertise_tags", [])),
+            hostname_template=raw.get("hostname_template"),
+            connector_only=bool(
+                raw.get("connector_only", provider_kind == "twingate")
+            ),
+        )
+    except SchemaValidationError as ex:
+        err_lines.append(f"{path}: {ex}")
+        rtnval = None
+
     return rtnval
 
 
@@ -1067,17 +1069,25 @@ def _parse_volumes(*, data: Optional[list],
         )
         if kind is None:
             continue
-        size_gb = entry.get("size_gb")
+        size_gb_raw = entry.get("size_gb")
         existing_id = entry.get("existing_id")
-        if size_gb is None and existing_id is None:
+        if size_gb_raw is None and existing_id is None:
             err_lines.append(
                 f"{path} must declare either 'size_gb' or 'existing_id'."
             )
             continue
+        size_gb = None
+        if size_gb_raw is not None:
+            size_gb = _validate_int(
+                raw=size_gb_raw, path=f"{path}.size_gb",
+                err_lines=err_lines, positive=True,
+            )
+            if size_gb is None:
+                continue
         spec = CloudVolumeSpec(
             name=entry["name"],
             kind=kind,
-            size_gb=int(size_gb) if size_gb is not None else None,
+            size_gb=size_gb,
             existing_id=existing_id,
             zone=entry.get("zone"),
         )
@@ -1262,11 +1272,17 @@ def _parse_dns_records(*, data: Optional[list],
                 f"{path}.values must be a non-empty list."
             )
             continue
+        ttl = _validate_int(
+            raw=entry.get("ttl", 300), path=f"{path}.ttl",
+            err_lines=err_lines, positive=True,
+        )
+        if ttl is None:
+            continue
         spec = CloudDnsRecordSpec(
             name=entry["name"],
             record_type=record_type,
             values=values,
-            ttl=int(entry.get("ttl", 300)),
+            ttl=ttl,
         )
         rtnval.append(spec)
     return rtnval
@@ -1365,7 +1381,7 @@ def _parse_accelerator_specs(*, raw: Any, path: str,
             continue
         if not _require_keys(
             entry=entry,
-            required=("kind", "model", "count"),
+            required=("kind", "model", "count", "memory_gb"),
             path=item_path,
             err_lines=err_lines,
         ):
@@ -1386,6 +1402,18 @@ def _parse_accelerator_specs(*, raw: Any, path: str,
         )
         if interconnect is None:
             continue
+        count = _validate_int(
+            raw=entry["count"], path=f"{item_path}.count",
+            err_lines=err_lines, positive=True,
+        )
+        if count is None:
+            continue
+        memory_gb = _validate_int(
+            raw=entry["memory_gb"], path=f"{item_path}.memory_gb",
+            err_lines=err_lines, positive=True,
+        )
+        if memory_gb is None:
+            continue
         model_name = entry["model"]
         if not _accelerator_model_known(
             model_name=model_name,
@@ -1399,9 +1427,9 @@ def _parse_accelerator_specs(*, raw: Any, path: str,
         spec = CloudAcceleratorSpec(
             kind=kind,
             model=model_name,
-            count=int(entry["count"]),
+            count=count,
             interconnect=interconnect,
-            memory_gb=entry.get("memory_gb"),
+            memory_gb=memory_gb,
         )
         rtnval.append(spec)
     return rtnval
@@ -1492,6 +1520,28 @@ def _parse_shared_filesystems(*, data: Optional[list],
                 f"'existing_id' (attach)."
             )
             continue
+        size_tb_val = None
+        if size_tb is not None:
+            size_tb_val = _validate_int(
+                raw=size_tb, path=f"{path}.size_tb",
+                err_lines=err_lines, positive=True,
+            )
+            if size_tb_val is None:
+                continue
+        throughput_val = None
+        if entry.get("throughput_gbps") is not None:
+            throughput_val = _validate_int(
+                raw=entry["throughput_gbps"],
+                path=f"{path}.throughput_gbps",
+                err_lines=err_lines, positive=True,
+            )
+            if throughput_val is None:
+                continue
+        tags_value = _normalise_tags(
+            raw=entry.get("tags"), path=f"{path}.tags", err_lines=err_lines
+        )
+        if tags_value is None:
+            continue
         mount_targets = _parse_shared_fs_mount_targets(
             raw=entry.get("mount_targets", []),
             path=f"{path}.mount_targets",
@@ -1502,14 +1552,11 @@ def _parse_shared_filesystems(*, data: Optional[list],
         spec = CloudSharedFilesystem(
             name=entry["name"],
             kind=kind,
-            size_tb=int(size_tb) if size_tb is not None else None,
-            throughput_gbps=(
-                int(entry["throughput_gbps"])
-                if entry.get("throughput_gbps") is not None else None
-            ),
+            size_tb=size_tb_val,
+            throughput_gbps=throughput_val,
             mount_targets=mount_targets,
             existing_id=existing_id,
-            tags=list(entry.get("tags", [])),
+            tags=tags_value,
         )
         rtnval.append(spec)
     return rtnval

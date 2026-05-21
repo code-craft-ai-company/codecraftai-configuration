@@ -13,123 +13,25 @@ __credits__ = []
 import os
 
 from dataclasses import dataclass, field
-from enum import IntEnum
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional
 
 from automojo.errors.exceptions import ConfigurationError
-
 
 # ---------------------------------------------------------------------------
 # Cross-repository type imports
 #
 # The canonical definitions of ``AddressPlane`` (automojo-interfaces) and
 # ``VPNOverlayProfile`` / ``SUPPORTED_VPN_PROVIDERS`` (automojo-networking)
-# are introduced by other M1 specs. Until those packages publish the
-# canonical modules, this schema fragment falls back to local equivalents
-# that match the upstream design exactly so that this package can build
-# and be tested in isolation.
-#
-# When the upstream packages land, the ``try`` imports succeed and the
-# local fallback classes below are simply not used by this module.
+# are core dependencies of this package. They are imported hard so that a
+# missing or mis-pathed core dependency fails loudly at import time rather
+# than silently substituting a structurally divergent local stand-in.
 # ---------------------------------------------------------------------------
 
-try:
-    from automojo.interfaces.iaddressplane import AddressPlane  # type: ignore
-except ImportError:
-    class AddressPlane(IntEnum):
-        """
-            Named address planes on which a device may be reachable.
-
-            PUBLIC  - routable on the public internet (or public DNS name).
-            PRIVATE - reachable on the VPC / private network.
-            OVERLAY - reachable via a mesh-VPN overlay (Tailscale 100.x.x.x,
-                      Twingate connector-routed CIDR, MagicDNS short name).
-        """
-        PUBLIC = 1
-        PRIVATE = 2
-        OVERLAY = 3
-
-
-try:
-    from automojo.networking.vpnoverlayprofile import (  # type: ignore
-        SUPPORTED_VPN_PROVIDERS,
-        VPNOverlayProfile,
-    )
-except ImportError:
-    SUPPORTED_VPN_PROVIDERS: Tuple[str, ...] = ("tailscale", "twingate")
-
-    @dataclass(frozen=True)
-    class VPNOverlayProfile:
-        """
-            Static configuration describing a single mesh-VPN overlay.
-
-            :param name: Identifier used by ``landscape.yaml`` and
-                ``VPNJoinSpec`` to reference this profile.
-            :param provider: One of ``SUPPORTED_VPN_PROVIDERS``.
-            :param network: Tailnet name or Twingate network slug.
-            :param tags: Default tags to advertise on devices joining the
-                overlay.
-            :param dns_suffix: DNS suffix to append to short names, or
-                ``None``.
-            :param magic_dns_enabled: ``True`` when short-name resolution
-                via the control plane is expected.
-            :param acl_ref: Optional path / id of an ACL document the
-                control plane should reconcile after first apply.
-        """
-        name: str
-        provider: str
-        network: str
-        tags: List[str] = field(default_factory=list)
-        dns_suffix: Optional[str] = None
-        magic_dns_enabled: bool = False
-        acl_ref: Optional[str] = None
-
-        def __post_init__(self) -> None:
-            if len(self.name) == 0:
-                raise ConfigurationError(
-                    "VPNOverlayProfile 'name' must be a non-empty string."
-                )
-            if any(ch.isspace() for ch in self.name):
-                raise ConfigurationError(
-                    "VPNOverlayProfile 'name' must contain no whitespace."
-                )
-            if self.provider not in SUPPORTED_VPN_PROVIDERS:
-                err_msg = (
-                    "VPNOverlayProfile 'provider' must be one of "
-                    f"{SUPPORTED_VPN_PROVIDERS}; got {self.provider!r}."
-                )
-                raise ConfigurationError(err_msg)
-            return
-
-        @classmethod
-        def from_dict(cls, *, data: dict) -> "VPNOverlayProfile":
-            """
-                Constructs a ``VPNOverlayProfile`` from a parsed dict.
-
-                :param data: A dict containing ``name``, ``provider``,
-                    ``network`` and optional override fields.
-
-                :returns: The constructed ``VPNOverlayProfile``.
-                :raises: ConfigurationError when required keys are missing.
-            """
-            required = ("name", "provider", "network")
-            missing: List[str] = [k for k in required if k not in data]
-            if len(missing) > 0:
-                err_msg = (
-                    "VPNOverlayProfile.from_dict missing required keys: "
-                    f"{missing!r}"
-                )
-                raise ConfigurationError(err_msg)
-            rtnval = cls(
-                name=data["name"],
-                provider=data["provider"],
-                network=data["network"],
-                tags=list(data.get("tags", [])),
-                dns_suffix=data.get("dns_suffix"),
-                magic_dns_enabled=bool(data.get("magic_dns_enabled", False)),
-                acl_ref=data.get("acl_ref"),
-            )
-            return rtnval
+from automojo.interfaces.addressplane import AddressPlane
+from automojo.networking.vpnoverlayprofile import (
+    SUPPORTED_VPN_PROVIDERS,
+    VPNOverlayProfile,
+)
 
 
 # ---------------------------------------------------------------------------

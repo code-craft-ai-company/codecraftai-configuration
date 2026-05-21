@@ -134,6 +134,7 @@ def make_full_payload() -> dict:
                  "provider": "lab-tailnet",
                  "control_plane_credential": "ts-prov-oauth",
                  "advertise_tags": ["tag:lab"],
+                 "hostname_template": "{name}-lab",
              }},
         ],
         "volumes": [
@@ -382,7 +383,8 @@ class TestInstancesBlock(unittest.TestCase):
         data = [{"name": "i1", "image": "ubuntu-24", "size": "small",
                  "subnet": "sub-a",
                  "vpn_join": {"provider": "no-provider",
-                              "control_plane_credential": "ts-prov-oauth"}}]
+                              "control_plane_credential": "ts-prov-oauth",
+                              "hostname_template": "{name}-lab"}}]
         with self.assertRaises(ConfigurationError) as ctx:
             load_cloud_instances_block(
                 data=data,
@@ -402,7 +404,8 @@ class TestInstancesBlock(unittest.TestCase):
         data = [{"name": "i1", "image": "ubuntu-24", "size": "small",
                  "subnet": "sub-a",
                  "vpn_join": {"provider": "lab-tailnet",
-                              "control_plane_credential": "no-such"}}]
+                              "control_plane_credential": "no-such",
+                              "hostname_template": "{name}-lab"}}]
         with self.assertRaises(ConfigurationError) as ctx:
             load_cloud_instances_block(
                 data=data,
@@ -422,7 +425,8 @@ class TestInstancesBlock(unittest.TestCase):
                  "subnet": "sub-a",
                  "vpn_join": {"provider": "lab-tailnet",
                               "control_plane_credential": "ts-prov-oauth",
-                              "advertise_tags": ["tag:lab"]}}]
+                              "advertise_tags": ["tag:lab"],
+                              "hostname_template": "{name}-lab"}}]
         instances = load_cloud_instances_block(
             data=data,
             images=self._images,
@@ -632,6 +636,44 @@ class TestSharedFilesystemsBlock(unittest.TestCase):
             load_cloud_shared_filesystems_block(data=data)
         msg = str(ctx.exception)
         self.assertIn("NOTAFS", msg)
+        return
+
+
+class TestGuardedIntConversions(unittest.TestCase):
+    """
+        Regression tests for the audit MEDIUM finding that unguarded
+        ``int(...)`` conversions could let a ``ValueError`` / ``TypeError``
+        escape as an uncaught crash instead of an accumulated
+        ``ConfigurationError``.
+    """
+
+    def test_dns_record_non_numeric_ttl_raises_configuration_error(self):
+        data = [{"name": "web.example.com", "record_type": "A",
+                 "values": ["192.0.2.1"], "ttl": "not-a-number"}]
+        with self.assertRaises(ConfigurationError) as ctx:
+            load_cloud_dns_records_block(data=data)
+        msg = str(ctx.exception)
+        self.assertIn("ttl", msg)
+        return
+
+    def test_accelerator_requires_memory_gb(self):
+        data = [{"instance_name": "i1",
+                 "accelerators": [{"kind": "GPU", "model": "H100_SXM",
+                                   "count": 8}]}]
+        with self.assertRaises(ConfigurationError) as ctx:
+            load_cloud_accelerators_block(data=data)
+        msg = str(ctx.exception)
+        self.assertIn("memory_gb", msg)
+        return
+
+    def test_accelerator_non_numeric_count_raises(self):
+        data = [{"instance_name": "i1",
+                 "accelerators": [{"kind": "GPU", "model": "H100_SXM",
+                                   "count": "many", "memory_gb": 80}]}]
+        with self.assertRaises(ConfigurationError) as ctx:
+            load_cloud_accelerators_block(data=data)
+        msg = str(ctx.exception)
+        self.assertIn("count", msg)
         return
 
 

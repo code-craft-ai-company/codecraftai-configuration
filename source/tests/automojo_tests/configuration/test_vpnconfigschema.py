@@ -137,7 +137,7 @@ class TestVPNConfigSchema(unittest.TestCase):
         self.assertEqual(profile.name, "lab-tailnet")
         self.assertEqual(profile.provider, "tailscale")
         self.assertEqual(profile.network, "acme.ts.net")
-        self.assertEqual(profile.tags, ["tag:lab"])
+        self.assertEqual(tuple(profile.tags), ("tag:lab",))
         self.assertTrue(profile.magic_dns_enabled)
         return
 
