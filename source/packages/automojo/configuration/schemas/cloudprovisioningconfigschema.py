@@ -40,7 +40,6 @@ from automojo.provisioning.model.vpn.vpnjoinspec import VPNJoinSpec
 from automojo.provisioning.model.cloud.cloudacceleratorspec import (
     CloudAcceleratorSpec,
 )
-from automojo.provisioning.model.cloud.cloudinterconnect import CloudInterconnect
 from automojo.provisioning.model.cloud.sharedfsmountspec import SharedFsMountSpec
 from automojo.provisioning.model.cloud.cloudsharedfilesystem import (
     CloudSharedFilesystem,
