@@ -26,20 +26,23 @@ from automojo.configuration.schemas.cloudprovisioningconfigschema import (
 
 
 # ---------------------------------------------------------------------------
-# Cross-repository type fallbacks.
+# Cross-repository type imports.
 #
-# The canonical workload models live in ``automojo-provisioning`` (Phase 1a).
-# Until those packages land this module uses lightweight local fallbacks.
+# The canonical ``WorkloadVenueKind`` ENUM lives in ``automojo-provisioning``.
+# It is imported hard so a missing or mis-pathed core dependency fails loudly
+# at import time. The previous fallback was a divergent string tuple named
+# ``WORKLOAD_VENUE_KINDS`` -- the canonical surface is the ENUM.
 # ---------------------------------------------------------------------------
 
-try:
-    from automojo.provisioning.models.workloadvenuekind import (  # type: ignore
-        WORKLOAD_VENUE_KINDS,
-    )
-except ImportError:
-    WORKLOAD_VENUE_KINDS: Tuple[str, ...] = (
-        "kubernetes", "slurm", "ray", "nomad",
-    )
+from automojo.provisioning.model.workload.workloadvenuekind import (
+    WorkloadVenueKind,
+)
+
+# Tuple of canonical kind string values, derived from the ENUM, used by the
+# value-based ``_validate_enum`` helper.
+WORKLOAD_VENUE_KINDS: Tuple[str, ...] = tuple(
+    member.value for member in WorkloadVenueKind
+)
 
 
 IMPLEMENTED_WORKLOAD_VENUE_KINDS: Tuple[str, ...] = ("kubernetes",)
@@ -269,6 +272,37 @@ def _validate_enum(*, raw: Any, accepted: Tuple[str, ...], path: str,
     return rtnval
 
 
+def _validate_int(*, raw: Any, path: str, err_lines: List[str],
+                  positive: bool = False) -> Optional[int]:
+    """
+        Converts ``raw`` to an ``int``, accumulating an error on failure
+        instead of letting a ``ValueError`` / ``TypeError`` escape.
+
+        :param raw: The candidate value.
+        :param path: YAML-like path used in the error message.
+        :param err_lines: Mutable list of error lines.
+        :param positive: When ``True`` the converted value must be > 0.
+
+        :returns: The converted ``int`` on success, ``None`` otherwise.
+    """
+    if isinstance(raw, bool):
+        err_lines.append(f"{path}={raw!r} must be an integer.")
+        rtnval = None
+        return rtnval
+    try:
+        converted = int(raw)
+    except (ValueError, TypeError):
+        err_lines.append(f"{path}={raw!r} must be an integer.")
+        rtnval = None
+        return rtnval
+    if positive and converted <= 0:
+        err_lines.append(f"{path}={converted} must be greater than 0.")
+        rtnval = None
+        return rtnval
+    rtnval = converted
+    return rtnval
+
+
 def _raise_if_errors(*, label: str, err_lines: List[str]) -> None:
     if len(err_lines) == 0:
         return
@@ -337,10 +371,16 @@ def _parse_accelerator_requests(*, raw: Any, path: str,
                 f"accelerator catalog."
             )
             continue
+        count = _validate_int(
+            raw=entry["count"], path=f"{item_path}.count",
+            err_lines=err_lines, positive=True,
+        )
+        if count is None:
+            continue
         req = WorkloadAcceleratorRequest(
             kind=entry["kind"],
             model=entry["model"],
-            count=int(entry["count"]),
+            count=count,
             interconnect=entry.get("interconnect"),
             memory_gb=entry.get("memory_gb"),
         )
@@ -554,6 +594,12 @@ def _parse_node_pools(*, raw: Any, path: str,
             err_lines=err_lines,
         ):
             continue
+        count = _validate_int(
+            raw=entry["count"], path=f"{item_path}.count",
+            err_lines=err_lines, positive=True,
+        )
+        if count is None:
+            continue
         accelerators = _parse_accelerator_requests(
             raw=entry.get("accelerators"),
             path=f"{item_path}.accelerators",
@@ -562,7 +608,7 @@ def _parse_node_pools(*, raw: Any, path: str,
         )
         pool = WorkloadNodePoolSpec(
             name=entry["name"],
-            count=int(entry["count"]),
+            count=count,
             size=entry["size"],
             accelerators=accelerators,
             taints=list(entry.get("taints", [])),
@@ -638,11 +684,11 @@ def _parse_workload_jobs(*, data: Optional[list],
         )
         if policy is None:
             continue
-        replicas = int(entry.get("replicas", 1))
-        if replicas <= 0:
-            err_lines.append(
-                f"{path}.replicas={replicas} must be greater than 0."
-            )
+        replicas = _validate_int(
+            raw=entry.get("replicas", 1), path=f"{path}.replicas",
+            err_lines=err_lines, positive=True,
+        )
+        if replicas is None:
             continue
         accelerators = _parse_accelerator_requests(
             raw=entry.get("accelerators"),
@@ -782,11 +828,11 @@ def _parse_workload_services(*, data: Optional[list],
                     f"reports no load-balancer support."
                 )
                 continue
-        replicas = int(entry.get("replicas", 1))
-        if replicas <= 0:
-            err_lines.append(
-                f"{path}.replicas={replicas} must be greater than 0."
-            )
+        replicas = _validate_int(
+            raw=entry.get("replicas", 1), path=f"{path}.replicas",
+            err_lines=err_lines, positive=True,
+        )
+        if replicas is None:
             continue
         accelerators = _parse_accelerator_requests(
             raw=entry.get("accelerators"),

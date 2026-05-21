@@ -23,6 +23,9 @@ requests = "^2.32.4"
 automojo-errors = { git = "https://github.com/automationmojo/automojo-errors.git", branch = "main" }
 automojo-this-app = { git = "https://github.com/automationmojo/automojo-this-app.git", branch = "main" }
 automojo-xmodules = { git = "https://github.com/automationmojo/automojo-xmodules.git", branch = "main" }
+automojo-interfaces = { git = "https://github.com/automationmojo/automojo-interfaces.git", branch = "main" }
+automojo-networking = { git = "https://github.com/automationmojo/automojo-networking.git", branch = "main" }
+automojo-provisioning = { git = "https://github.com/automationmojo/automojo-provisioning.git", branch = "main" }
 
 couchdb = { version="^1.2", optional = true}
 pymongo = { version="^4.13.2", optional = true }
