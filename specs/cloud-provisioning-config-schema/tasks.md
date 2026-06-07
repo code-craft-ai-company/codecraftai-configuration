@@ -52,6 +52,6 @@
 Items 6, 7, 11, 16, 19, 24, 27 are intentionally deferred. They depend on the
 `accelerators` and `shared_filesystems` blocks whose canonical model classes
 (`CloudAcceleratorSpec`, `CloudSharedFilesystem`) live in
-`automojo-provisioning` (Phase 1a). The schema fragments for them will land
+`codecraftai-provisioning` (Phase 1a). The schema fragments for them will land
 in the next pass once those upstream types are importable. Item 19 (override
 warning) is wired to the plugin layer which is Phase 2.

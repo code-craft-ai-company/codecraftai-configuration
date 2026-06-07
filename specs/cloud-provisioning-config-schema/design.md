@@ -4,13 +4,13 @@
 
 This module is the config-layer entry point for cloud provisioning specs.  It owns
 the YAML fragment definitions, the top-level loader function, and the binding to the
-`SchemaObject`-based model classes in `automojo-provisioning`.  Schema validation
+`SchemaObject`-based model classes in `codecraftai-provisioning`.  Schema validation
 delegates to the model classes' own `from_dict` — the fragments here only describe
 the *outer shape* (which keys exist, how they nest) and the registration that wires
 each key to its model.
 
-The decision to keep the schema in `automojo-configuration` instead of inside
-`automojo-provisioning` follows the project's existing pattern: every consumer that
+The decision to keep the schema in `codecraftai-configuration` instead of inside
+`codecraftai-provisioning` follows the project's existing pattern: every consumer that
 loads landscape, profile, or environment YAML uses the same loader and validator,
 and provisioning is no different.
 
@@ -35,7 +35,7 @@ and provisioning is no different.
    CloudProvisioningConfig (typed aggregate)
         │
         ▼
-   consumed by automojo-provisioning.ProvisioningEngine
+   consumed by codecraftai-provisioning.ProvisioningEngine
 ```
 
 ---
@@ -154,7 +154,7 @@ devices:
 ## Module Layout
 
 ```
-source/packages/automojo/configuration/cloudprovisioning/
+source/packages/ccai/configuration/cloudprovisioning/
 ├── cloudprovisioningconfig.py
 ├── cloudacceleratorassignment.py
 ├── cloudprovisioningfragment.py
@@ -166,13 +166,13 @@ source/packages/automojo/configuration/cloudprovisioning/
 
 ## See Also
 
-- [cloud-resource-model](../../../automojo-provisioning/specs/cloud-resource-model/design.md)
-- [accelerator-and-interconnect-model](../../../automojo-provisioning/specs/accelerator-and-interconnect-model/design.md)
-- [accelerator-catalog](../../../automojo-provisioning/specs/accelerator-catalog/design.md)
-- [vpn-join-spec](../../../automojo-provisioning/specs/vpn-join-spec/design.md)
-- [provisioning-engine-pipeline](../../../automojo-provisioning/specs/provisioning-engine-pipeline/design.md)
+- [cloud-resource-model](../../../codecraftai-provisioning/specs/cloud-resource-model/design.md)
+- [accelerator-and-interconnect-model](../../../codecraftai-provisioning/specs/accelerator-and-interconnect-model/design.md)
+- [accelerator-catalog](../../../codecraftai-provisioning/specs/accelerator-catalog/design.md)
+- [vpn-join-spec](../../../codecraftai-provisioning/specs/vpn-join-spec/design.md)
+- [provisioning-engine-pipeline](../../../codecraftai-provisioning/specs/provisioning-engine-pipeline/design.md)
 - [workload-provisioning-config-schema](../workload-provisioning-config-schema/design.md)
-- existing `automojo-configuration` loader contract (referenced from the config root spec)
+- existing `codecraftai-configuration` loader contract (referenced from the config root spec)
 
 ---
 
@@ -188,4 +188,4 @@ source/packages/automojo/configuration/cloudprovisioning/
 - **Override pass-through test** — venue override map appears verbatim on the
   resulting venue object.
 - No property tests required at this layer — the heavy invariants live in the
-  model and lifecycle specs in `automojo-provisioning`.
+  model and lifecycle specs in `codecraftai-provisioning`.

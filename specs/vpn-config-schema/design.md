@@ -3,7 +3,7 @@
 ## Overview
 
 `vpn-config-schema` adds the `vpn:` top-level block schema to
-`automojo-configuration`. It defines a single module —
+`codecraftai-configuration`. It defines a single module —
 `schemas/vpnconfigschema.py` — that contains a `VPNBlock` frozen
 dataclass, a `load_vpn_block(data)` function that validates and
 constructs the typed object from a parsed dict, and a
@@ -11,22 +11,22 @@ constructs the typed object from a parsed dict, and a
 
 The module reuses the existing typed classes:
 
-- `VPNOverlayProfile` (from `automojo-networking`) — the shape of
+- `VPNOverlayProfile` (from `codecraftai-networking`) — the shape of
   each `providers[*]` entry.
-- `AddressPlane` (from `automojo-interfaces`) — the `default_plane`
+- `AddressPlane` (from `codecraftai-interfaces`) — the `default_plane`
   enum.
-- The credential manager singleton (from `automojo-credentials`) —
+- The credential manager singleton (from `codecraftai-credentials`) —
   for `credential_ref` resolution and provider-compatibility check.
 
 Per the §8 commitment "one spec, two read paths," `load_vpn_block`
 is the one-way conversion from dict to typed object; every consumer
 that needs the VPN configuration uses the typed object thereafter.
 
-**See Also:** [vpn-overlay-profile](../../../automojo-networking/specs/vpn-overlay-profile/design.md),
-[address-plane-types](../../../automojo-interfaces/specs/address-plane-types/design.md),
-[tailscale-credentials](../../../automojo-credentials/specs/tailscale-credentials/design.md),
-[twingate-credentials](../../../automojo-credentials/specs/twingate-credentials/design.md),
-[well-known-vpn-and-venue-categories](../../../automojo-credentials/specs/well-known-vpn-and-venue-categories/design.md).
+**See Also:** [vpn-overlay-profile](../../../codecraftai-networking/specs/vpn-overlay-profile/design.md),
+[address-plane-types](../../../codecraftai-interfaces/specs/address-plane-types/design.md),
+[tailscale-credentials](../../../codecraftai-credentials/specs/tailscale-credentials/design.md),
+[twingate-credentials](../../../codecraftai-credentials/specs/twingate-credentials/design.md),
+[well-known-vpn-and-venue-categories](../../../codecraftai-credentials/specs/well-known-vpn-and-venue-categories/design.md).
 
 ---
 
@@ -76,13 +76,13 @@ from dataclasses import dataclass, field
 from typing import List
 import os
 
-from automojo.errors.exceptions import ConfigurationError
-from automojo.interfaces.iaddressplane import AddressPlane
-from automojo.networking.vpnoverlayprofile import (
+from ccai.errors.exceptions import ConfigurationError
+from ccai.interfaces.iaddressplane import AddressPlane
+from ccai.networking.vpnoverlayprofile import (
     SUPPORTED_VPN_PROVIDERS,
     VPNOverlayProfile,
 )
-from automojo.credentials.wellknown import get_credentials_by_category
+from ccai.credentials.wellknown import get_credentials_by_category
 
 
 # Per-provider acceptable credential categories.
@@ -238,7 +238,7 @@ def dump_vpn_block(*, block: VPNBlock) -> dict:
 ## Module Layout
 
 ```
-automojo-configuration/source/packages/automojo/configuration/
+codecraftai-configuration/source/packages/ccai/configuration/
   schemas/
     __init__.py
     vpnconfigschema.py   <-- VPNBlock, load_vpn_block, dump_vpn_block,
@@ -250,15 +250,15 @@ automojo-configuration/source/packages/automojo/configuration/
 
 ## See Also
 
-- [vpn-overlay-profile](../../../automojo-networking/specs/vpn-overlay-profile/design.md)
+- [vpn-overlay-profile](../../../codecraftai-networking/specs/vpn-overlay-profile/design.md)
   — the typed object each `providers[*]` entry becomes.
-- [address-plane-types](../../../automojo-interfaces/specs/address-plane-types/design.md)
+- [address-plane-types](../../../codecraftai-interfaces/specs/address-plane-types/design.md)
   — supplies `AddressPlane`.
-- [tailscale-credentials](../../../automojo-credentials/specs/tailscale-credentials/design.md),
-  [twingate-credentials](../../../automojo-credentials/specs/twingate-credentials/design.md)
+- [tailscale-credentials](../../../codecraftai-credentials/specs/tailscale-credentials/design.md),
+  [twingate-credentials](../../../codecraftai-credentials/specs/twingate-credentials/design.md)
   — supply the credential categories validated by
   `PROVIDER_CATEGORY_COMPATIBILITY`.
-- [well-known-vpn-and-venue-categories](../../../automojo-credentials/specs/well-known-vpn-and-venue-categories/design.md)
+- [well-known-vpn-and-venue-categories](../../../codecraftai-credentials/specs/well-known-vpn-and-venue-categories/design.md)
   — supplies the credential lookup surface.
 
 ---

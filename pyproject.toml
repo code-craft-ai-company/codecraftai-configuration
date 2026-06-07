@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "automojo-configuration"
-description = "Automation Mojo - Configuration"
+name = "codecraftai-configuration"
+description = "Code Craft AI - Configuration"
 version = "0.0.1"
 authors = ['Myron W. Walker']
 readme = "README.rst"
@@ -13,19 +13,19 @@ classifiers = [
 keywords = [
     "python"
 ]
-packages = [{include="automojo", from="source/packages"}]
+packages = [{include="ccai", from="source/packages"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
 pyyaml = "^6.0.2"
 cryptography = "^45.0.5"
 requests = "^2.32.4"
-automojo-errors = { git = "https://github.com/automationmojo/automojo-errors.git", branch = "main" }
-automojo-this-app = { git = "https://github.com/automationmojo/automojo-this-app.git", branch = "main" }
-automojo-xmodules = { git = "https://github.com/automationmojo/automojo-xmodules.git", branch = "main" }
-automojo-interfaces = { git = "https://github.com/automationmojo/automojo-interfaces.git", branch = "main" }
-automojo-networking = { git = "https://github.com/automationmojo/automojo-networking.git", branch = "main" }
-automojo-provisioning = { git = "https://github.com/automationmojo/automojo-provisioning.git", branch = "main" }
+codecraftai-errors = { git = "https://github.com/automationmojo/codecraftai-errors.git", branch = "main" }
+codecraftai-this-app = { git = "https://github.com/automationmojo/codecraftai-this-app.git", branch = "main" }
+codecraftai-xmodules = { git = "https://github.com/automationmojo/codecraftai-xmodules.git", branch = "main" }
+codecraftai-interfaces = { git = "https://github.com/automationmojo/codecraftai-interfaces.git", branch = "main" }
+codecraftai-networking = { git = "https://github.com/automationmojo/codecraftai-networking.git", branch = "main" }
+codecraftai-provisioning = { git = "https://github.com/automationmojo/codecraftai-provisioning.git", branch = "main" }
 
 couchdb = { version="^1.2", optional = true}
 pymongo = { version="^4.13.2", optional = true }

@@ -32,7 +32,7 @@ deployments.
    WorkloadProvisioningConfig (typed aggregate)
         │
         ▼
-   consumed by automojo-provisioning.ProvisioningEngine
+   consumed by codecraftai-provisioning.ProvisioningEngine
         (alongside the parallel CloudProvisioningConfig)
 ```
 
@@ -166,7 +166,7 @@ destroy.  This is the path for self-hosted K8s on cloud infrastructure.
 ## Module Layout
 
 ```
-source/packages/automojo/configuration/workloadprovisioning/
+source/packages/ccai/configuration/workloadprovisioning/
 ├── workloadprovisioningconfig.py
 ├── workloadprovisioningfragment.py
 ├── workloadprovisioningloader.py
@@ -177,11 +177,11 @@ source/packages/automojo/configuration/workloadprovisioning/
 
 ## See Also
 
-- [workload-venue-model](../../../automojo-provisioning/specs/workload-venue-model/design.md)
-- [accelerator-and-interconnect-model](../../../automojo-provisioning/specs/accelerator-and-interconnect-model/design.md)
-- [accelerator-catalog](../../../automojo-provisioning/specs/accelerator-catalog/design.md)
+- [workload-venue-model](../../../codecraftai-provisioning/specs/workload-venue-model/design.md)
+- [accelerator-and-interconnect-model](../../../codecraftai-provisioning/specs/accelerator-and-interconnect-model/design.md)
+- [accelerator-catalog](../../../codecraftai-provisioning/specs/accelerator-catalog/design.md)
 - [cloud-provisioning-config-schema](../cloud-provisioning-config-schema/design.md)
-- [provisioning-engine-pipeline](../../../automojo-provisioning/specs/provisioning-engine-pipeline/design.md)
+- [provisioning-engine-pipeline](../../../codecraftai-provisioning/specs/provisioning-engine-pipeline/design.md)
 
 ---
 

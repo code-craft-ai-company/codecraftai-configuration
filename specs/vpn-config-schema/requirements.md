@@ -3,13 +3,13 @@
 ## Introduction
 
 The `vpn-config-schema` feature adds a schema fragment for the new
-top-level `vpn:` block in `landscape.yaml` (and any other automojo
+top-level `vpn:` block in `landscape.yaml` (and any other ccai
 config document that consumes the same shape) to
-`automojo-configuration`. The schema captures:
+`codecraftai-configuration`. The schema captures:
 
 - a list of VPN providers under a landscape / spec
 - per-provider credential reference (looked up by category in
-  `automojo-credentials`)
+  `codecraftai-credentials`)
 - per-provider default tags
 - the landscape-wide default `address_plane` (`PUBLIC` / `PRIVATE` /
   `OVERLAY`)
@@ -25,11 +25,11 @@ This spec does *not* define the runtime classes (those live in
 *schema* that converts a YAML/dict blob into those typed objects with
 validation.
 
-**See Also:** [vpn-overlay-profile](../../../automojo-networking/specs/vpn-overlay-profile/design.md),
-[tailscale-credentials](../../../automojo-credentials/specs/tailscale-credentials/design.md),
-[twingate-credentials](../../../automojo-credentials/specs/twingate-credentials/design.md),
-[address-plane-types](../../../automojo-interfaces/specs/address-plane-types/design.md),
-[well-known-vpn-and-venue-categories](../../../automojo-credentials/specs/well-known-vpn-and-venue-categories/design.md).
+**See Also:** [vpn-overlay-profile](../../../codecraftai-networking/specs/vpn-overlay-profile/design.md),
+[tailscale-credentials](../../../codecraftai-credentials/specs/tailscale-credentials/design.md),
+[twingate-credentials](../../../codecraftai-credentials/specs/twingate-credentials/design.md),
+[address-plane-types](../../../codecraftai-interfaces/specs/address-plane-types/design.md),
+[well-known-vpn-and-venue-categories](../../../codecraftai-credentials/specs/well-known-vpn-and-venue-categories/design.md).
 
 ---
 
@@ -43,7 +43,7 @@ VPN-related schema in one module so I do not chase fragments.
 #### Acceptance Criteria
 
 1. THE SYSTEM SHALL place the schema under
-   `automojo-configuration/source/packages/automojo/configuration/schemas/vpnconfigschema.py`.
+   `codecraftai-configuration/source/packages/ccai/configuration/schemas/vpnconfigschema.py`.
 2. THE SYSTEM SHALL register the schema with the existing
    configuration loader so the `vpn:` top-level key is recognised
    and validated automatically.
