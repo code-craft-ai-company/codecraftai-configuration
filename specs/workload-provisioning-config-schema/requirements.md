@@ -4,7 +4,7 @@
 
 This spec defines the YAML schema fragments for workload-shaped venues
 (`WorkloadVenue`, `WorkloadCluster`, `WorkloadJob`, `WorkloadService`).  Like its
-cloud-side sibling, the fragments live in `automojo-configuration` so every consumer
+cloud-side sibling, the fragments live in `codecraftai-configuration` so every consumer
 (engine, CLI, tests, downstream users) shares one parser and one validator.
 
 Workload specs are usually authored in the *same* YAML file as cloud specs (the engine

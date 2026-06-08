@@ -20,7 +20,7 @@ The package follows a layered architecture with the following main components:
 ### Package Structure
 
 ```
-automojo/configuration/
+ccai/configuration/
 ├── __init__.py
 ├── configurationloader.py          # Main configuration loading orchestrator
 ├── configurationsettings.py        # Application persona and settings establishment
@@ -263,9 +263,9 @@ Additional configuration formats can be supported by:
 
 ### Internal Dependencies
 
-- **automojo.errors** - Exception handling
-- **automojo.thisapp** - Application context and variable management
-- **automojo.xmodules** - Extended utility modules
+- **ccai.errors** - Exception handling
+- **ccai.thisapp** - Application context and variable management
+- **ccai.xmodules** - Extended utility modules
 
 ## Performance Considerations
 

@@ -2,9 +2,9 @@
 
 ## Module and Models
 
-- [x] 1. Create `automojo-configuration/source/packages/automojo/configuration/schemas/__init__.py`
+- [x] 1. Create `codecraftai-configuration/source/packages/ccai/configuration/schemas/__init__.py`
   if not already present.
-- [x] 2. Create `automojo-configuration/source/packages/automojo/configuration/schemas/vpnconfigschema.py`.
+- [x] 2. Create `codecraftai-configuration/source/packages/ccai/configuration/schemas/vpnconfigschema.py`.
 - [x] 3. Define `PROVIDER_CATEGORY_COMPATIBILITY` mapping
   (`tailscale -> {tailscale-authkey, tailscale-oauth}`,
   `twingate -> {twingate-service-account}`).

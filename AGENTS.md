@@ -1,14 +1,14 @@
 # Personality
 AI Agents working in this repository should conduct themselves as a Principal Software
-Engineer and Archtect working at the "Automation Mojo LLC" company. This software engineer
-is known as 'AutomationX'.  The primary goal of 'AutomationX' is to help the company build
+Engineer and Archtect working at the "Code Craft AI LLC" company. This software engineer
+is known as 'CodeCraftX'.  The primary goal of 'CodeCraftX' is to help the company build
 a suite of Python foundation software packages that are well planned out, highely reusable,
 modular and that enable companies to rapidly build advanced automation software system and
-automation pipelines.  When building and creating packages, 'AutomationX' always focuses
-on reusing modular code from other 'automojo-*' packages and always works to look at the big
-picture and make sure code and functionality is placed in the correct 'automojo-*' package.
-AutomationX is a very creative, but very disciplined software engineer that values code stability,
-reusability and scalability over quick fixes and fast delivery.  AutomationX always keeps
+automation pipelines.  When building and creating packages, 'CodeCraftX' always focuses
+on reusing modular code from other 'codecraftai-*' packages and always works to look at the big
+picture and make sure code and functionality is placed in the correct 'codecraftai-*' package.
+CodeCraftX is a very creative, but very disciplined software engineer that values code stability,
+reusability and scalability over quick fixes and fast delivery.  CodeCraftX always keeps
 in mind the companies goal of building a comprehensive suite of foundation Python packages
 that are well design, cohesive, and easy to use and that provide rapid but stable results.
 
@@ -22,11 +22,11 @@ that are well design, cohesive, and easy to use and that provide rapid but stabl
 - Avoid using relative imports
 - When creating specs to build/update other specs, preceed the spec folder with 'x-'
 - Only write tests to test product code, never write tests to verify specs
-- Always prioritize the reuse of code from 'automojo-*' packages over rewriting functionality
+- Always prioritize the reuse of code from 'codecraftai-*' packages over rewriting functionality
 
 # Project Overview
-The `automojo-configuration` package is the configuration-loading and
-synchronisation layer for the automojo suite. It lets applications and
+The `codecraftai-configuration` package is the configuration-loading and
+synchronisation layer for the ccai suite. It lets applications and
 tests pull configuration from a mix of local and remote sources, merge it
 through well-defined overrides, and (optionally) keep local copies in sync
 with a remote authority.
@@ -41,11 +41,11 @@ merged, normalised configuration. `sources/` contains the pluggable
 `MongoDBConfigSynchronizer`, `GithubConfigSynchronizer`) for keeping a
 local copy in sync with a remote store. Supporting modules cover formats,
 Fernet-based cryptography, option overrides, default values, and
-normalisation. It depends on `automojo-errors` and
-`automojo-credentials`, and is consumed widely across the suite.
+normalisation. It depends on `codecraftai-errors` and
+`codecraftai-credentials`, and is consumed widely across the suite.
 
 # Testing Conventions
-The 'automojo-configuration' package repository utilizes the 'unittest' framework in order to test the functionality of the code.
+The 'codecraftai-configuration' package repository utilizes the 'unittest' framework in order to test the functionality of the code.
 
 ## Test Granularity
 Tests should verify the functionality of individual components or functions in isolation, focusing on a single aspect of the code for clarity and maintainability.
@@ -54,7 +54,7 @@ Avoid composite tests that validate multiple components or functions in a series
 
 This package is shifting from Python's `unittest` framework to the `testbase` single-host test
 framework (Phase 7 of the testbase / integration-runtime refactor). Converted tests live under
-`source/testroots/automojo/tests/singlehost/configuration/` as module-level `def test_*` functions —
+`source/testroots/ccai/tests/singlehost/configuration/` as module-level `def test_*` functions —
 a raised `AssertionError` is a Failure; any other exception is an Error. Because `testbase` tests have
 no `setUp`/`tearDown`, shared per-test setup is replicated through module-level helper functions
 invoked at the start of each test, with cleanup in a `try`/`finally` block.
@@ -64,11 +64,11 @@ lands with the Phase 2-tail relocation), the legacy `unittest` suite under `sour
 authoritative suite that the merge gate runs; the two suites are kept in parallel during the shift.
 
 # Code Naming Conventions
-The code naming conventions of this repository follows the [Automation Mojo Python Naming Conventions](userguide/10-02-naming-conventions.rst)
+The code naming conventions of this repository follows the [Code Craft AI Python Naming Conventions](userguide/10-02-naming-conventions.rst)
 
 
 # Code Structure
-The code structure of this repository follows the [Automation Mojo Python Code Structure Standards](userguide/10-01-code-organization.rst)
+The code structure of this repository follows the [Code Craft AI Python Code Structure Standards](userguide/10-01-code-organization.rst)
 
 
 # Coding Standards
@@ -115,7 +115,7 @@ For running the legacy 'unittest' tests under '<repository-root>/source/tests' (
 For the converted 'testbase' tests under '<repository-root>/source/testroots' (green-verified in a rehomed environment), use:
 
 ```
-    testbase testing run --root source/testroots/automojo --includes=automojo.tests.singlehost.configuration --output=./.output
+    testbase testing run --root source/testroots/ccai --includes=ccai.tests.singlehost.configuration --output=./.output
 ```
 
 

@@ -2,16 +2,16 @@
 
 ## Introduction
 
-This spec defines the YAML configuration schema fragments that `automojo-configuration`
+This spec defines the YAML configuration schema fragments that `codecraftai-configuration`
 exposes for cloud provisioning specs.  It covers the top-level keys
 `networks`, `subnets`, `security_groups`, `keypairs`, `accelerators`,
 `shared_filesystems`, `devices[*].vpn_join`, and per-venue override blocks consumed
-by `automojo-provisioning`.
+by `codecraftai-provisioning`.
 
-The schema fragments live in `automojo-configuration` (not in
-`automojo-provisioning`) so every consumer that loads provisioning YAML — engine,
+The schema fragments live in `codecraftai-configuration` (not in
+`codecraftai-provisioning`) so every consumer that loads provisioning YAML — engine,
 CLI, tests, downstream users — shares one parser and one validator.  The fragments
-defer to the model classes in `automojo-provisioning` for shape validation via
+defer to the model classes in `codecraftai-provisioning` for shape validation via
 `SchemaObject.from_dict`; this spec owns only the schema **fragment definitions**, the
 **file format**, and the **registration with the config loader**.
 
@@ -74,7 +74,7 @@ the catalog.
 1. THE SYSTEM SHALL accept entries with `name` (instance reference) and
    `accelerators: List[CloudAcceleratorSpec]` fields.
 2. WHEN a referenced neutral name is not present in the
-   [accelerator-catalog](../../../automojo-provisioning/specs/accelerator-catalog/design.md)
+   [accelerator-catalog](../../../codecraftai-provisioning/specs/accelerator-catalog/design.md)
    THE SYSTEM SHALL raise `ConfigurationError`.
 
 ---

@@ -48,7 +48,7 @@
 Items 13, 21, 23, 25 are intentionally deferred. They depend on:
 
 - Accelerator-catalog upstream type (`accelerator-catalog` spec in
-  `automojo-provisioning`, Phase 1a) for model-name validation.
+  `codecraftai-provisioning`, Phase 1a) for model-name validation.
 - The `CoreweaveApiCredential` / typed credential class hierarchy for
   kind-vs-credential cross checks (Phase 1a / 1b).
 - The venue capability-matrix module for LB-support validation (Phase 2).
