@@ -2,12 +2,12 @@
 name = "codecraftai-configuration"
 description = "Code Craft AI - Configuration"
 version = "0.0.1"
-authors = ['Myron W. Walker']
+authors = ["Myron Walker <myron.walker@gmail.com>"]
 readme = "README.rst"
-license = "LICENSE.txt"
+license = "LicenseRef-CodeCraftAI-Dual-License"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "License :: Other/Proprietary License",
     "Operating System :: POSIX"
 ]
 keywords = [
@@ -21,6 +21,7 @@ pyyaml = "^6.0.2"
 cryptography = "^45.0.5"
 requests = "^2.32.4"
 codecraftai-errors = { git = "https://github.com/automationmojo/codecraftai-errors.git", branch = "main" }
+codecraftai-credentials = { git = "https://github.com/automationmojo/codecraftai-credentials.git", branch = "main" }
 codecraftai-this-app = { git = "https://github.com/automationmojo/codecraftai-this-app.git", branch = "main" }
 codecraftai-xmodules = { git = "https://github.com/automationmojo/codecraftai-xmodules.git", branch = "main" }
 codecraftai-interfaces = { git = "https://github.com/automationmojo/codecraftai-interfaces.git", branch = "main" }
@@ -35,8 +36,6 @@ couchdb = ["couchdb"]
 pymongo = ["pymongo"]
 
 [tool.poetry.group.dev.dependencies]
-
-[tool.poetry.group.dbio.dependencies]
 
 [build-system]
 requires = ["poetry-core"]

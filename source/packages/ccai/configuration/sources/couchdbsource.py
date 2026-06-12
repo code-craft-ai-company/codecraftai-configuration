@@ -5,6 +5,7 @@ __credits__ = []
 
 from typing import Dict, Optional, Tuple, Union
 
+import logging
 import re
 import traceback
 
@@ -14,6 +15,8 @@ from ccai.configuration.configurationformat import ConfigurationFormat
 from ccai.configuration.sources.configurationsourcebase import (
     ConfigurationSourceBase
 )
+
+logger = logging.getLogger()
 
 class CouchDBSource(ConfigurationSourceBase):
 
@@ -124,9 +127,9 @@ class CouchDBSource(ConfigurationSourceBase):
             config_info = db.get(config_name)
             config_format = ConfigurationFormat.JSON
 
-        except:
+        except Exception as xcpt:
             errmsg = traceback.format_exc()
-            print(errmsg)
+            logger.error(errmsg)
             config_info = None
 
         return config_format, config_info

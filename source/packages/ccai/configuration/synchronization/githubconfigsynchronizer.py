@@ -60,12 +60,6 @@ class GithubConfigSynchronizer(ConfigSynchronizerBase):
 
         mobj = cls.parse_exp.match(uri)
         if mobj is not None:
-            try:
-                import pymongo
-            except ImportError:
-                errmsg = "You must install the 'pymongo' module in order to use couchdb sources."
-                raise ConfigurationError(errmsg)
-
             matchinfo = mobj.groupdict()
 
             owner = matchinfo["owner"]
@@ -139,7 +133,7 @@ class GithubConfigSynchronizer(ConfigSynchronizerBase):
         commit_content = commit_content_buffer.getvalue()
 
         blob_info = {
-            "content": base64.b64encode(commit_content),
+            "content": base64.b64encode(commit_content.encode("utf-8")).decode("ascii"),
             "encoding": "base64"
         }
 
@@ -243,7 +237,7 @@ class GithubConfigSynchronizer(ConfigSynchronizerBase):
         retrieve_url = f"https://github.com/{self._owner}/{self._repo}/releases/latest/download/{publish_path}"
         resp: requests.Response = requests.get(retrieve_url, headers=headers)
         if resp.status_code == HTTPStatus.OK:
-            config_buffer = io.StringIO(resp.content)
+            config_buffer = io.StringIO(resp.text)
             config_info = yaml.safe_load(config_buffer)
             config_format = "yaml"
 
@@ -252,7 +246,7 @@ class GithubConfigSynchronizer(ConfigSynchronizerBase):
             retrieve_url = f"https://github.com/{self._owner}/{self._repo}/releases/latest/download/{publish_path}"
             resp: requests.Response = requests.get(retrieve_url, headers=headers)
             if resp.status_code == HTTPStatus.OK:
-                config_buffer = io.StringIO(resp.content)
+                config_buffer = io.StringIO(resp.text)
                 config_info = json.load(config_buffer)
                 config_format = "json"
 

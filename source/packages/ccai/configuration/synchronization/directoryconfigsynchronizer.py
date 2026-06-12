@@ -32,7 +32,7 @@ class DirectoryConfigSynchronizer(ConfigSynchronizerBase):
         return
 
 
-    def _retrieve_configuration(self, venue: str, user: str, config_class: str, config_name: str) -> Union[Tuple[str, dict], Tuple[None, None]]:
+    def _retrieve_configuration(self, venue: str, user: str, config_class: str, config_name: str, credentials=None) -> Union[Tuple[str, dict], Tuple[None, None]]:
         """
             Retrieve a configuration file from the directory store.
 
@@ -65,7 +65,7 @@ class DirectoryConfigSynchronizer(ConfigSynchronizerBase):
         return config_format, config_info
 
 
-    def _publish_configuration(self, venue: str, user: str, config_class: str, config_name: str, config_format: str, config_info: str):
+    def _publish_configuration(self, venue: str, user: str, config_class: str, config_name: str, config_format: str, config_info: str, credentials=None):
         """
             Publish a configuration file to the directory store.
 

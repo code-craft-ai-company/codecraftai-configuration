@@ -9,7 +9,7 @@ Highlights
 
 - ``ConfigurationLoader`` top-level entry point that reads from a list of source URIs and produces a merged, normalised configuration.
 - Pluggable ``ConfigurationSourceBase`` with concrete sources: ``DirectorySource``, ``HttpSource``, ``CouchDBSource``, and ``MongoDBSource``.
-- ``ConfigSynchronizerBase`` family with ``DirectoryConfigSynchronizer``, ``CouchDBConfigSynchronizer``, ``MongoDBConfigSynchronizer``, and ``GithubConfigSynchronizer``.
+- ``ConfigSynchronizerBase`` family with ``DirectoryConfigSynchronizer``, ``CouchDbConfigSynchronizer``, ``MongoDbConfigSynchronizer``, and ``GithubConfigSynchronizer``.
 - Supporting modules for formats, Fernet-based cryptography, option overrides, default values, and normalisation.
 
 Repository Structure

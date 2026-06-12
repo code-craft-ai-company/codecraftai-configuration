@@ -22,7 +22,7 @@ class CouchDbConfigSynchronizer(ConfigSynchronizerBase):
         ..note: For couchdb, the configurations are stored in a database under a database which is a combination of the
                 the 'database prefix' declared in the storage-uri combined with the venue.  For example, 'configdb-azure'.
                 The configuration documents are stored with names based on the remaining grouping parameters.  The document
-                name consists of the '<user>-<config-class>-<config-name>'.  For example 'myron-landscapes-apod-picluster'.
+                name consists of the '<config-class>-<user>-<config-name>'.  For example 'landscapes-myron-apod-picluster'.
     """
 
     scheme = "couchdb"
@@ -159,7 +159,8 @@ class CouchDbConfigSynchronizer(ConfigSynchronizerBase):
 
         document_info = db.get(document_name)
 
-        config_format = document_info["format"]
-        config_info = document_info["config"]
+        if document_info is not None:
+            config_format = document_info["format"]
+            config_info = document_info["config"]
 
         return config_format, config_info

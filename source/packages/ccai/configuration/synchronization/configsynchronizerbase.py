@@ -51,28 +51,28 @@ class ConfigSynchronizerBase(ABC):
         errors = []
 
         try:
-            config_format, config_info = self._load_local_config("landscapes", config_name)
+            config_format, config_info = self._load_local_config(local_store, "landscapes", config_name)
             if config_format is not None:
                 self._publish_configuration(venue, user, "landscapes", config_name, config_format, config_info, credentials=credentials)
         except Exception as xcpt:
             errors.append(str(xcpt))
 
         try:
-            config_format, config_info = self._load_local_config("topologies", config_name)
+            config_format, config_info = self._load_local_config(local_store, "topologies", config_name)
             if config_format is not None:
                 self._publish_configuration(venue, user, "topologies", config_name, config_format, config_info, credentials=credentials)
         except Exception as xcpt:
             errors.append(str(xcpt))
 
         try:
-            config_format, config_info = self._load_local_config("runtimes", config_name)
+            config_format, config_info = self._load_local_config(local_store, "runtimes", config_name)
             if config_format is not None:
                 self._publish_configuration(venue, user, "runtimes", config_name, config_format, config_info, credentials=credentials)
         except Exception as xcpt:
             errors.append(str(xcpt))
 
         try:
-            config_format, config_info = self._load_local_config("credentials", config_name)
+            config_format, config_info = self._load_local_config(local_store, "credentials", config_name)
             if config_format is not None:
                 self._publish_configuration(venue, user, "credentials", config_name, config_format, config_info, credentials=credentials)
         except Exception as xcpt:
@@ -141,16 +141,18 @@ class ConfigSynchronizerBase(ABC):
         config_format = None
         config_info = None
 
-        config_file_cand = os.path.join(local_store, config_class, f"{config_name}.yaml")
-        if os.path.exists(config_file_cand):
-            config_file_found = config_file_cand
-            with open(config_file_cand, 'r') as cf:
+        yaml_file_cand = os.path.join(local_store, config_class, f"{config_name}.yaml")
+        json_file_cand = os.path.join(local_store, config_class, f"{config_name}.json")
+
+        # Load YAML if present, else fall back to JSON. (The prior version read an
+        # unbound config_file_found when no .yaml existed -> UnboundLocalError, and
+        # gated the .json branch on the YAML being found, inverting the either/or.)
+        if os.path.exists(yaml_file_cand):
+            with open(yaml_file_cand, 'r') as cf:
                 config_info = yaml.safe_load(cf)
                 config_format = "yaml"
-        
-        if config_file_found is not None:
-            config_file_cand = os.path.join(local_store, config_class, f"{config_name}.json")
-            with open(config_file_cand, 'r') as cf:
+        elif os.path.exists(json_file_cand):
+            with open(json_file_cand, 'r') as cf:
                 config_info = json.load(cf)
                 config_format = "json"
 

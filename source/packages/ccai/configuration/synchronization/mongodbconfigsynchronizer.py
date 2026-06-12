@@ -60,12 +60,15 @@ class MongoDbConfigSynchronizer(ConfigSynchronizerBase):
             try:
                 import pymongo
             except ImportError:
-                errmsg = "You must install the 'pymongo' module in order to use couchdb sources."
+                errmsg = "You must install the 'pymongo' module in order to use mongodb sources."
                 raise ConfigurationError(errmsg)
 
             matchinfo = mobj.groupdict()
 
-            scheme = matchinfo["scheme"]
+            # The class 'scheme' attribute is the source of truth -- the parse_exp
+            # has no 'scheme' capture group, so reading matchinfo["scheme"] raised
+            # KeyError for every matching mongodb:// URI.
+            scheme = cls.scheme
             host = matchinfo["host"]
 
             port = None
@@ -104,13 +107,13 @@ class MongoDbConfigSynchronizer(ConfigSynchronizerBase):
 
         import pymongo
 
-        client = pymongo.MongoClient(dburi)
+        client = pymongo.MongoClient(dburi, tlsAllowInvalidCertificates=not self._verify_certificate)
 
         try:
             db = client[self._database]
 
             collection = db[venue]
-            
+
             collection.insert_one(document_info)
         finally:
             client.close()
@@ -140,17 +143,22 @@ class MongoDbConfigSynchronizer(ConfigSynchronizerBase):
 
         import pymongo
 
-        client = pymongo.MongoClient(dburi, tlsAllowInvalidCertificates=self._verify_certificate)
+        # tlsAllowInvalidCertificates is the inverse of "verify the certificate" --
+        # when verify_certificate is True we must NOT allow invalid certificates.
+        client = pymongo.MongoClient(dburi, tlsAllowInvalidCertificates=not self._verify_certificate)
 
         try:
             db = client[self._database]
 
             collection = db[venue]
 
-            document_info = collection.find_one({"_id": config_name})
+            # Query by the same composite key used at publish time
+            # (document_name), not config_name -- otherwise no document is found.
+            document_info = collection.find_one({"_id": document_name})
 
-            config_format = document_info["format"]
-            config_info = document_info["config"]
+            if document_info is not None:
+                config_format = document_info["format"]
+                config_info = document_info["config"]
         finally:
             client.close()
 

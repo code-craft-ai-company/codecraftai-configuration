@@ -90,7 +90,4 @@ class HttpSource(ConfigurationSourceBase):
                     config_info = json.loads(config_content)
                 break
 
-        if config_info is not None:
-            config_format = None
-
         return config_format, config_info

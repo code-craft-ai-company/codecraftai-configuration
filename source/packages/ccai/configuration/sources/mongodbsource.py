@@ -62,13 +62,6 @@ class MongoDBSource(ConfigurationSourceBase):
         """
         return self._host
 
-    @property
-    def port(self) -> int:
-        """
-            Port number for the MongoDB server.
-        """
-        return self._port
-
     @classmethod
     def parse(cls, uri: str, verify_certificate: bool = True) -> Union[None, "MongoDBSource"]:
         """
