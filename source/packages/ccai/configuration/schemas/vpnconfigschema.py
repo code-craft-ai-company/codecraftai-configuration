@@ -28,7 +28,7 @@ from ccai.errors.exceptions import ConfigurationError
 # ---------------------------------------------------------------------------
 
 from ccai.interfaces.addressplane import AddressPlane
-from ccai.networking.vpnoverlayprofile import (
+from ccai.interfaces.vpnoverlayprofile import (
     SUPPORTED_VPN_PROVIDERS,
     VPNOverlayProfile,
 )

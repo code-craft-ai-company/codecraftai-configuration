@@ -34,7 +34,7 @@ from ccai.configuration.schemas.cloudprovisioningconfigschema import (
 # ``WORKLOAD_VENUE_KINDS`` -- the canonical surface is the ENUM.
 # ---------------------------------------------------------------------------
 
-from ccai.provisioning.model.workload.workloadvenuekind import (
+from ccai.interfaces.workloadvenuekind import (
     WorkloadVenueKind,
 )
 

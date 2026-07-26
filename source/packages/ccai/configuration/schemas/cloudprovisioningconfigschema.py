@@ -35,13 +35,13 @@ from ccai.configuration.schemas.vpnconfigschema import VPNBlock
 # ``hostname_template`` optional while the canonical class requires it).
 # ---------------------------------------------------------------------------
 
-from ccai.provisioning.model.exceptions import SchemaValidationError
-from ccai.provisioning.model.vpn.vpnjoinspec import VPNJoinSpec
-from ccai.provisioning.model.cloud.cloudacceleratorspec import (
+from ccai.interfaces.schemavalidationerror import SchemaValidationError
+from ccai.interfaces.vpnjoinspec import VPNJoinSpec
+from ccai.interfaces.cloudacceleratorspec import (
     CloudAcceleratorSpec,
 )
-from ccai.provisioning.model.cloud.sharedfsmountspec import SharedFsMountSpec
-from ccai.provisioning.model.cloud.cloudsharedfilesystem import (
+from ccai.interfaces.sharedfsmountspec import SharedFsMountSpec
+from ccai.interfaces.cloudsharedfilesystem import (
     CloudSharedFilesystem,
 )
 

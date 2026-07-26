@@ -48,7 +48,7 @@ def test_vpn_schema_overlayprofile_is_canonical() -> None:
         ``ccai.networking`` type.
     """
     from ccai.configuration.schemas import vpnconfigschema
-    from ccai.networking.vpnoverlayprofile import VPNOverlayProfile
+    from ccai.interfaces.vpnoverlayprofile import VPNOverlayProfile
 
     assert vpnconfigschema.VPNOverlayProfile is VPNOverlayProfile
     return
@@ -61,7 +61,7 @@ def test_cloud_schema_vpnjoinspec_is_canonical() -> None:
         ``hostname_template`` (the fallback made it optional).
     """
     from ccai.configuration.schemas import cloudprovisioningconfigschema
-    from ccai.provisioning.model.vpn.vpnjoinspec import VPNJoinSpec
+    from ccai.interfaces.vpnjoinspec import VPNJoinSpec
 
     assert cloudprovisioningconfigschema.VPNJoinSpec is VPNJoinSpec
     return
@@ -73,7 +73,7 @@ def test_workload_schema_venuekind_is_canonical_enum() -> None:
         the canonical ENUM (the fallback was a divergent string tuple).
     """
     from ccai.configuration.schemas import workloadprovisioningconfigschema
-    from ccai.provisioning.model.workload.workloadvenuekind import (
+    from ccai.interfaces.workloadvenuekind import (
         WorkloadVenueKind,
     )
 
@@ -89,10 +89,10 @@ def test_cloud_schema_canonical_cloud_types() -> None:
         provisioning types, not local fallbacks.
     """
     from ccai.configuration.schemas import cloudprovisioningconfigschema
-    from ccai.provisioning.model.cloud.cloudacceleratorspec import (
+    from ccai.interfaces.cloudacceleratorspec import (
         CloudAcceleratorSpec,
     )
-    from ccai.provisioning.model.cloud.cloudsharedfilesystem import (
+    from ccai.interfaces.cloudsharedfilesystem import (
         CloudSharedFilesystem,
     )
 
