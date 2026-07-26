@@ -26,7 +26,7 @@ class ConfigurationDefaults:
         "logging": {
             "levels": {
                 "console": "INFO",
-                "logfile": "DEBUG"
+                "logfile": "INFO"
             }
         }
     }

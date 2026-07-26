@@ -43,16 +43,6 @@ class CONFIGURATION_MAPS:
 
 
 
-DEFAULT_CONFIGURATION = {
-    "version": "1.0.0",
-    "logging": {
-        "levels": {
-            "console": "INFO",
-            "logfile": "DEBUG"
-        }
-    }
-}
-
 def default_config_directory():
     rtnval = os.path.join(PersonaVariables.AM_PRESENCE_DIR, "config")
     return rtnval
