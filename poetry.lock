@@ -246,7 +246,7 @@ codecraftai-errors = {git = "https://github.com/automationmojo/codecraftai-error
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-credentials.git"
 reference = "main"
-resolved_reference = "baa3e88e990a5dd3bc01e51f7bcca2de89cc907e"
+resolved_reference = "f15214cc3972b562d53f77bd15381782fee0f5c3"
 
 [[package]]
 name = "codecraftai-errors"
@@ -262,7 +262,7 @@ develop = false
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-errors.git"
 reference = "main"
-resolved_reference = "a3ee3ce854614330c11512af8c6078db5ecb0375"
+resolved_reference = "bbc01a9b9e7602c225ffab0716bc6e56b472e4b4"
 
 [[package]]
 name = "codecraftai-extension"
@@ -278,7 +278,7 @@ develop = false
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-extension.git"
 reference = "main"
-resolved_reference = "a3c3b5df8af386d20871c15cfd2162a8673a0569"
+resolved_reference = "154a29978e55f7c0aedf19d65420ab705db876f7"
 
 [[package]]
 name = "codecraftai-interfaces"
@@ -297,7 +297,7 @@ codecraftai-errors = {git = "https://github.com/automationmojo/codecraftai-error
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-interfaces.git"
 reference = "main"
-resolved_reference = "6e332363c9047647f57d14d327b7e015a2bb2b5f"
+resolved_reference = "4b86d4488e7a502c56947ff94f798a01a0fa829a"
 
 [[package]]
 name = "codecraftai-this-app"
@@ -318,7 +318,7 @@ codecraftai-xmodules = {git = "https://github.com/automationmojo/codecraftai-xmo
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-this-app.git"
 reference = "main"
-resolved_reference = "8289c97049256dc92a1f8904ff51fedb966da3b1"
+resolved_reference = "9852466b74364db9d2caa2dd5db9dc3c6b22ec5d"
 
 [[package]]
 name = "codecraftai-waiting"
@@ -334,7 +334,7 @@ develop = false
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-waiting.git"
 reference = "main"
-resolved_reference = "6d5aee59acd1831b4093bab7c4a87b4a9f9124d7"
+resolved_reference = "071b83b5ff6ce8cb8966aee7e6a2de97a6e926d1"
 
 [[package]]
 name = "codecraftai-xmodules"
@@ -355,7 +355,7 @@ debugpy = "^1.8.14"
 type = "git"
 url = "https://github.com/automationmojo/codecraftai-xmodules.git"
 reference = "main"
-resolved_reference = "f61677c85978f498664ce6b7ce5ed113964ffd6f"
+resolved_reference = "7c2935cf442e9e1747765f820d9ea811b85756c0"
 
 [[package]]
 name = "couchdb"
