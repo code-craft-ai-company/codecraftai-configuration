@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "codecraftai-configuration"
 description = "Code Craft AI - Configuration"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Myron Walker <myron.walker@gmail.com>"]
 readme = "README.rst"
 license = "LicenseRef-CodeCraftAI-Dual-License"
@@ -20,11 +20,10 @@ python = ">=3.10,<4.0"
 pyyaml = "^6.0.2"
 cryptography = "^45.0.5"
 requests = "^2.32.4"
-codecraftai-errors = { version = "<2.0.0", source = "codecraftai" }
+codecraftai-foundations = { version = "<2.0.0", source = "codecraftai" }
 codecraftai-credentials = { version = "<2.0.0", source = "codecraftai" }
 codecraftai-this-app = { version = "<2.0.0", source = "codecraftai" }
 codecraftai-xmodules = { version = "<2.0.0", source = "codecraftai" }
-codecraftai-interfaces = { version = "<2.0.0", source = "codecraftai" }
 
 couchdb = { version="^1.2", optional = true}
 pymongo = { version="^4.13.2", optional = true }
