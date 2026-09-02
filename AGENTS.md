@@ -41,7 +41,7 @@ merged, normalised configuration. `sources/` contains the pluggable
 `MongoDBConfigSynchronizer`, `GithubConfigSynchronizer`) for keeping a
 local copy in sync with a remote store. Supporting modules cover formats,
 Fernet-based cryptography, option overrides, default values, and
-normalisation. It depends on `codecraftai-errors` and
+normalisation. It depends on `codecraftai-foundations` and
 `codecraftai-credentials`, and is consumed widely across the suite.
 
 # Testing Conventions

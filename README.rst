@@ -2,7 +2,7 @@
 Code Craft AI Configuration
 ==============================
 
-The ``codecraftai-configuration`` package is the configuration-loading and synchronisation layer for the ccai suite. It lets applications and tests pull configuration from a mix of local and remote sources, merge it through well-defined overrides, and (optionally) keep local copies in sync with a remote authority. It depends on ``codecraftai-errors`` and ``codecraftai-credentials``, and is consumed widely across the suite.
+The ``codecraftai-configuration`` package is the configuration-loading and synchronisation layer for the ccai suite. It lets applications and tests pull configuration from a mix of local and remote sources, merge it through well-defined overrides, and (optionally) keep local copies in sync with a remote authority. It depends on ``codecraftai-foundations`` and ``codecraftai-credentials``, and is consumed widely across the suite.
 
 Highlights
 ==========
