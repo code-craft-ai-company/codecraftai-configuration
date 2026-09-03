@@ -269,6 +269,12 @@ def _parse_provider_entry(*, entry: Any, idx: int, err_lines: List[str],
         "acl_ref": entry.get("acl_ref"),
     }
 
+    # ConfigurationError means the run was given information it cannot rely on.
+    # It derives from BaseException so it ends the run; it is caught here ONLY to
+    # accumulate it into ``err_lines`` so the operator sees every configuration
+    # problem in one pass.  This module still terminates: ``load_vpn_block``
+    # raises a single ConfigurationError enumerating every collected line.  Do
+    # not change this into a path that returns normally with problems ignored.
     try:
         rtnval = VPNOverlayProfile.from_dict(data=profile_data)
     except ConfigurationError as ex:
@@ -311,6 +317,9 @@ def _resolve_credential_ref(*, cred_ref: Any, idx: int, err_lines: List[str],
         rtnval = None
         return rtnval
 
+    # Aggregated, not suppressed: an unresolvable credential_ref is appended to
+    # ``err_lines`` below and ``load_vpn_block`` raises one ConfigurationError
+    # listing every problem.  The run still ends on a bad configuration.
     try:
         rtnval = resolver(cred_ref)
     except ConfigurationError:
@@ -356,6 +365,10 @@ def _build_credential_resolver(*, injected: Optional[CredentialLookup]) -> Crede
             rtnval = None
             return rtnval
 
+        # A missing credential identifier is reported by the caller through
+        # ``err_lines``, which ``load_vpn_block`` turns into a single raised
+        # ConfigurationError.  Returning None here feeds that aggregation; it
+        # never lets a run continue with an unresolved credential.
         try:
             rtnval = CREDENTIAL_MANAGER_SINGLETON.lookup_credential(identifier)
         except ConfigurationError:
