@@ -40,7 +40,6 @@ from ccai.configuration.configurationloader import (
 from ccai.configuration.schemas.vpnconfigschema import (
     AddressPlane,
     PROVIDER_CATEGORY_COMPATIBILITY,
-    VPNBlock,
     VPNOverlayProfile,
     dump_vpn_block,
     load_vpn_block,

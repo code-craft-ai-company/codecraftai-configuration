@@ -119,7 +119,7 @@ class CouchDbConfigSynchronizer(ConfigSynchronizerBase):
             "config": config_info
         }
 
-        config_info = db.save(document_info)
+        db.save(document_info)
 
         return
 

@@ -173,8 +173,6 @@ def resolve_configuration_variables():
     ctx.insert(ContextPaths.CONFIG_TOPOLOGY, CONFIGURATION_MAPS.TOPOLOGY_CONFIGURATION_MAP)
     ctx.insert(ContextPaths.CONFIG_RUNTIME, CONFIGURATION_MAPS.RUNTIME_CONFIGURATION_MAP)
 
-    config_directory =  this_app.get_variable_value(ConfigVariablesDesc.AM_CONFIG_DIRECTORY)
-
     # ====================== PROCESS CREDENTIAL VARIABLES ==============================
 
     use_credentials = False

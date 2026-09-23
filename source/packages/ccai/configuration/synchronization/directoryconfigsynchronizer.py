@@ -19,7 +19,7 @@ class DirectoryConfigSynchronizer(ConfigSynchronizerBase):
     """
 
     scheme = "dir"
-    parse_exp = re.compile(r"dir://(?P<directory>[/s/S]+)")
+    parse_exp = re.compile(r"dir://(?P<directory>[\s\S]+)")
 
     def __init__(self, storage_uri: str, local_store: str):
         """

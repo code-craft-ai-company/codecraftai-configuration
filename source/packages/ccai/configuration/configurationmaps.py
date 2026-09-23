@@ -17,8 +17,6 @@ import os
 
 from collections import OrderedDict
 
-from ccai.errors.exceptions import SemanticError
-
 from ccai.thisapp.thisapplication import ThisApplication
 from ccai.thisapp.wellknown import ThisApplicationSingleton
 

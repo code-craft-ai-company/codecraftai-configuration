@@ -16,7 +16,7 @@ import requests
 
 from http import HTTPStatus
 
-from ccai.errors.exceptions import ConfigurationError, PublishError
+from ccai.errors.exceptions import PublishError
 
 from ccai.configuration.synchronization.configsynchronizerbase import ConfigSynchronizerBase
 
@@ -117,7 +117,6 @@ class GithubConfigSynchronizer(ConfigSynchronizerBase):
 
         commit_sha = commit_info["sha"]
         commit_tree = commit_info["tree"]
-        commit_tree_sha = commit_tree["sha"]
         commit_tree_url = commit_tree["url"]
 
         # Step 3 - Post a blob of the commit to github
@@ -137,14 +136,14 @@ class GithubConfigSynchronizer(ConfigSynchronizerBase):
             "encoding": "base64"
         }
 
+        # GitHub "create a blob" (POST .../git/blobs) responds with 201 Created.
         blobs_post_url = f"https://api.github.com/repos/{self._owner}/{self._repo}/git/blobs"
         resp: requests.Response = requests.post(blobs_post_url, headers=headers, json=blob_info)
-        if resp.status_code != HTTPStatus.ACCEPTED:
+        if resp.status_code != HTTPStatus.CREATED:
             errmsg = f"Failed to post a blob for config. config_name={config_name}"
             raise PublishError(errmsg)
         
         blob_info = resp.json()
-        blob_url = blob_info["url"]
         blob_sha = blob_info["sha"]
 
         # Step 4 - Get a hold of the tree of the top commit
@@ -203,8 +202,11 @@ class GithubConfigSynchronizer(ConfigSynchronizerBase):
             "force": False
         }
 
-        resp: requests.Response = requests.patch(ref_url, json=move_head_body, headers=headers)
-        if resp.status_code != HTTPStatus.ACCEPTED:
+        # GitHub "update a reference" is PATCH .../git/refs/{ref} (plural 'refs'; the singular
+        # '.../git/ref/{ref}' used in Step 1 is the read-only endpoint) and responds with 200 OK.
+        update_ref_url = f"https://api.github.com/repos/{self._owner}/{self._repo}/git/refs/{ref}"
+        resp: requests.Response = requests.patch(update_ref_url, json=move_head_body, headers=headers)
+        if resp.status_code != HTTPStatus.OK:
             errmsg = f"Failed to move HEAD to our commit for branch. ref={ref} config_name={config_name}"
             raise PublishError(errmsg)
 
