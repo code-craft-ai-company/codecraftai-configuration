@@ -27,6 +27,10 @@ dependencies = [
 couchdb = ["couchdb>=1.2,<2.0.0"]
 pymongo = ["pymongo>=4.13.2,<5.0.0"]
 
+[project.urls]
+Repository = "https://github.com/code-craft-ai-company/codecraftai-configuration"
+Issues = "https://github.com/code-craft-ai-company/codecraftai-configuration/issues"
+
 [dependency-groups]
 dev = []
 
