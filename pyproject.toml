@@ -17,10 +17,10 @@ dependencies = [
     "pyyaml>=6.0.2,<7.0.0",
     "cryptography>=45.0.5,<51.0.0",
     "requests>=2.32.4,<3.0.0",
-    "codecraftai-foundations<2.0.0",
-    "codecraftai-credentials<2.0.0",
-    "codecraftai-this-app<2.0.0",
-    "codecraftai-xmodules<2.0.0",
+    "codecraftai-foundations>=1.0.0,<2.0.0",
+    "codecraftai-credentials>=1.0.0,<2.0.0",
+    "codecraftai-this-app>=1.0.0,<2.0.0",
+    "codecraftai-xmodules>=1.0.0,<2.0.0",
 ]
 
 [project.optional-dependencies]
@@ -39,25 +39,6 @@ packages = [{include="ccai", from="source/packages"}]
 # The README only marks the shared 'ccai' namespace directory in the source tree. It stays out of the
 # wheel because several codecraftai packages install into that directory and a file there collides.
 exclude = ["source/packages/ccai/README.md"]
-
-[tool.poetry.dependencies]
-codecraftai-foundations = {source = "codecraftai"}
-codecraftai-credentials = {source = "codecraftai"}
-codecraftai-this-app = {source = "codecraftai"}
-codecraftai-xmodules = {source = "codecraftai"}
-
-[[tool.poetry.source]]
-name = "codecraftai"
-url = "https://code-craft.ai/licensed-repository/simple/"
-priority = "supplemental"
-
-[[tool.uv.index]]
-# Same licensed index as [[tool.poetry.source]]. Listed before PyPI so that
-# codecraftai-* packages (direct and transitive) resolve from it; everything
-# else falls through to PyPI. Credentials: UV_INDEX_CODECRAFTAI_USERNAME /
-# UV_INDEX_CODECRAFTAI_PASSWORD, or `uv auth login`.
-name = "codecraftai"
-url = "https://code-craft.ai/licensed-repository/simple/"
 
 [tool.ruff.lint]
 # Deliberately narrow.  This gate exists for one reason: a bare `except:`
